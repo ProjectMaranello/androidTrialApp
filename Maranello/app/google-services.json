@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1075167520265",
+    "firebase_url": "https://maranello-c4914.firebaseio.com",
+    "project_id": "maranello-c4914",
+    "storage_bucket": "maranello-c4914.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075167520265:android:730361a69c6bbf49",
+        "android_client_info": {
+          "package_name": "o.maranello"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075167520265-o9ei14bpugdp6tj9e9mkjsipm4qv0vn7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoZ1Z_gwOC5MI889fVoWQA_4_ulpfcPl0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
