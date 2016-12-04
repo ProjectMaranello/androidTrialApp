@@ -13,6 +13,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class ofr the speedtest port
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Log.class})
 public class SpeedtestTest {
