@@ -265,8 +265,10 @@ public class Speedtest {
                 if(bestLatency == null || bestLatency > latency){
                     bestLatency = latency;
                     best = entry.getValue();
+                    results.setPing(latency);
                 }
         }
+        results.setServer(best);
         Log.i(TAG, "Exit: getBestServer");
     }
 
@@ -323,14 +325,14 @@ public class Speedtest {
         Long stop = System.currentTimeMillis();
         Long totalDownload = new Long(0);
         for(Long result : finished){
-            System.out.println("All Done:" + result);
             totalDownload += result;
         }
         Double downloadResult = (totalDownload / (stop - start)) * 8.0;
-        System.out.println(downloadResult);
         if(downloadResult > 100000){
             config.put("threadsUpload",8);
         }
+        results.setBytesReceived(totalDownload);
+        results.setDownloadSpeed(downloadResult);
     }
     /**
      * Test upload speed against speedtest.net
@@ -339,7 +341,6 @@ public class Speedtest {
         if (best == null){
             getBestServer();
         }
-        config.put("threadsUpload",8);
         ArrayList<Integer> sizes = new ArrayList<Integer>();
         Integer requestCount = (Integer)config.get("uploadMax");
         HashMap<HttpURLConnection,HTTPUploaderData> requests = new HashMap<HttpURLConnection,HTTPUploaderData>();
@@ -380,16 +381,20 @@ public class Speedtest {
             e.printStackTrace();
         }
         Long stop = System.currentTimeMillis();
-        Long totalDownload = new Long(0);
-        System.out.println("Complete Building Stats");
+        Long totalUpload = new Long(0);
         for(Long result : finished){
-            System.out.println("All Done:" + result);
-            totalDownload += result;
+            totalUpload += result;
         }
-        Double downloadResult = (totalDownload / (stop - start)) * 8.0;
-        System.out.println(downloadResult);
-        if(downloadResult > 100000){
-            config.put("threadsUpload",8);
-        }
+        Double uploadResult = (totalUpload / (stop - start)) * 8.0;
+        results.setBytesSent(totalUpload);
+        results.setUploadSpeed(uploadResult);
     }
+
+
+    public SpeedtestResults runTest(){
+        this.download();
+        this.upload();
+        return this.results;
+    }
+
 }

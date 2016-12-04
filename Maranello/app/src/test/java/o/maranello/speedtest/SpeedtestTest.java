@@ -68,4 +68,13 @@ public class SpeedtestTest {
 
     }
 
+    @Test
+    public void runTest_isCorrect() throws Exception {
+        Speedtest test = new Speedtest();
+        SpeedtestResults results = test.runTest();
+        results.dump();
+
+
+    }
+
 }
