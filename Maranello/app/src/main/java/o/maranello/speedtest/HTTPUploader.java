@@ -27,11 +27,8 @@ public class HTTPUploader implements Runnable {
 
     @Override
     public void run() {
-
         int current = 0;
-        System.out.println("Running");
         SpeedTestUtils.catchRequest(request, data.getData());
-
         InputStream input = SpeedTestUtils.getResponseStream(request);
         BufferedInputStream buffer = new BufferedInputStream(input);
         byte[] bufferLimit = new byte[10240];
@@ -44,7 +41,6 @@ public class HTTPUploader implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Finished");
     }
 
     public Long getResult(){

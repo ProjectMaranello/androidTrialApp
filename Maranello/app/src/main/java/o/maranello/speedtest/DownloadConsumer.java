@@ -28,13 +28,11 @@ public class DownloadConsumer implements Runnable{
                 while (entry.getValue().isAlive()){
                     entry.getValue().join(1);
                 }
-                //FIXME: sum
                 finished.add(entry.getKey().getResult());
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
     }
 }

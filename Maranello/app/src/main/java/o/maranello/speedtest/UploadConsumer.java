@@ -22,22 +22,17 @@ public class UploadConsumer implements Runnable{
     @Override
     public void run() {
         while (finished.size() < requestCount){
-            System.out.println("Remaining: " + (requestCount - finished.size()));
             try {
                 Map<HTTPUploader,Thread> map = queue.take();
                 Map.Entry<HTTPUploader,Thread> entry = map.entrySet().iterator().next();
                 while (entry.getValue().isAlive()){
                     entry.getValue().join(1);
                 }
-
-                //FIXME: sum
                 finished.add(entry.getKey().getResult());
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("Ending Consumer: ");
-
     }
 }

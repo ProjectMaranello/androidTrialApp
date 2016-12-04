@@ -32,7 +32,6 @@ public class DownloadProducer implements Runnable {
                 Map<HTTPDownloader,Thread> map = new HashMap<HTTPDownloader,Thread>();
                 map.put(downloader, thread);
                 queue.put(map);
-                //        callback(i, request_count, start=True)
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

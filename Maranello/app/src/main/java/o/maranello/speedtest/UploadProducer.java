@@ -39,22 +39,10 @@ public class UploadProducer implements Runnable {
                 e.printStackTrace();
             }
             if(currentRequestCount >= requestCount){
-                System.out.println("Early Exit");
                 break;
             }else{
                 currentRequestCount++;
             }
         }
-
     }
-
 }
-/**
- def producer(q, requests, request_count):
- for i, request in enumerate(requests[:request_count]):
- thread = HTTPUploader(i, request[0], start, request[1],
- self.config['length']['upload'])
- thread.start()
- q.put(thread, True)
- callback(i, request_count, start=True)
- */

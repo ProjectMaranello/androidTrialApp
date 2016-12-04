@@ -92,7 +92,7 @@ public class Speedtest {
             //Tweeking this will produce more accurate results but also send more data. original above
             Integer[] up_sizes = {32768, 32768, 32768, 32768, 32768, 131072, 262144};
 
-            System.out.println("Upload Sizes:" + up_sizes.length);
+            Log.i(TAG, "Upload Sizes:" + up_sizes.length);
             Integer[] sizesUpload = new Integer[up_sizes.length - ratio +1];
             System.arraycopy(up_sizes, ratio-1, sizesUpload, 0, up_sizes.length - ratio +1);
             Integer countsUpload = upload_max * 2 / sizesUpload.length;
@@ -108,7 +108,7 @@ public class Speedtest {
             Integer lengthUpload = Integer.valueOf(upload.get("testlength"));
             Integer lengthDownload = Integer.valueOf(download.get("testlength"));
 
-            System.out.println("Count Download:" + countsDownload);
+            Log.i(TAG, "Count Download:" + countsDownload);
 
 
             config.put("client",client);

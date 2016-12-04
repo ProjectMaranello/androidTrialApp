@@ -25,9 +25,7 @@ public class HTTPDownloader implements Runnable {
 
     @Override
     public void run() {
-
         int current = 0;
-        System.out.println("Running");
         SpeedTestUtils.catchRequest(request, null);
         InputStream input = SpeedTestUtils.getResponseStream(request);
         BufferedInputStream buffer = new BufferedInputStream(input);
@@ -42,27 +40,10 @@ public class HTTPDownloader implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Finished");
     }
 
     public Long getResult(){
         return result;
     }
 
-    /*
-
-    def run(self):
-        try:
-            if (timeit.default_timer() - self.starttime) <= self.timeout:
-                f = urlopen(self.request)
-                while (not SHUTDOWN_EVENT.isSet() and
-                        (timeit.default_timer() - self.starttime) <=
-                        self.timeout):
-                    self.result.append(len(f.read(10240)))
-                    if self.result[-1] == 0:
-                        break
-                f.close()
-        except IOError:
-            pass
-     */
 }

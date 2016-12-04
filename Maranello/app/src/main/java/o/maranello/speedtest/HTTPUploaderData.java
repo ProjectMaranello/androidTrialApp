@@ -29,25 +29,8 @@ public class HTTPUploaderData {
         payload.append(repeated.substring(0,repeated.length()-9));
         data = payload.toString();
     }
-
     public String getData(){
         return this.data;
     }
-    /*
 
-
-
-
-    def read(self, n=10240):
-        if ((timeit.default_timer() - self.start) <= self.timeout and
-                not SHUTDOWN_EVENT.isSet()):
-            chunk = self.data.read(n)
-            self.total.append(len(chunk))
-            return chunk
-        else:
-            raise SpeedtestUploadTimeout
-
-    def __len__(self):
-        return self.length
-        */
 }
