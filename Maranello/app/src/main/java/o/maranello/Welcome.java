@@ -17,8 +17,11 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import o.maranello.notification.RegistrationIntentService;
+
 public class Welcome extends AppCompatActivity {
     private static final String TAG = "Welcome";
+    public static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private ProgressBar mRegistrationProgressBar;

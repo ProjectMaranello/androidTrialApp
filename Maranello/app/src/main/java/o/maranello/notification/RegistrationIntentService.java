@@ -1,4 +1,4 @@
-package o.maranello;
+package o.maranello.notification;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -12,6 +12,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
+
+import o.maranello.QuickstartPreferences;
+import o.maranello.R;
 
 public class RegistrationIntentService extends IntentService {
 

@@ -33,9 +33,9 @@ public class HTTPUploader implements Runnable {
         BufferedInputStream buffer = new BufferedInputStream(input);
         byte[] bufferLimit = new byte[10240];
         try {
-            System.out.println(request.getResponseCode());
+            //System.out.println(request.getResponseCode());
             while ((current = buffer.read(bufferLimit)) != -1) {
-                System.out.println(data.getData().length());
+                //System.out.println(data.getData().length());
                 result += Long.valueOf(current);
             }
         } catch (IOException e) {

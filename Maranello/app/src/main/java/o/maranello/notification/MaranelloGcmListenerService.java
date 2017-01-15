@@ -1,4 +1,4 @@
-package o.maranello;
+package o.maranello.notification;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,11 +12,14 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import o.maranello.R;
+import o.maranello.Welcome;
+
 /**
  * Created by kristianthornley on 27/11/16.
  */
-public class MyGcmListenerService extends GcmListenerService {
-    private static final String TAG = "MyGcmListenerService";
+public class MaranelloGcmListenerService extends GcmListenerService {
+    private static final String TAG = "MaranelloGcmListenerSev";
 
     /**
      * Called when message is received.
@@ -78,6 +81,6 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(0, notificationBuilder.build());
     }
 }

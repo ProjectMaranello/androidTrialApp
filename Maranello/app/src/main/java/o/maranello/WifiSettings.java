@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class WifiSettings extends AppCompatActivity {
 
     private static final String TAG = "WifiSettings";
-
+    public static final String PREFS_NAME = "MaranelloPrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
