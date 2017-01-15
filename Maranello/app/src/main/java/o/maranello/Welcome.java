@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import o.maranello.notification.MarenelloPreferences;
 import o.maranello.notification.RegistrationIntentService;
 
 public class Welcome extends AppCompatActivity {
@@ -40,7 +41,7 @@ public class Welcome extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences.getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                boolean sentToken = sharedPreferences.getBoolean(MarenelloPreferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
                     mInformationTextView.setText(getString(R.string.gcm_send_message));
                 } else {
@@ -68,7 +69,7 @@ public class Welcome extends AppCompatActivity {
     private void registerReceiver(){
         if(!isReceiverRegistered) {
             LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+                    new IntentFilter(MarenelloPreferences.REGISTRATION_COMPLETE));
             isReceiverRegistered = true;
         }
     }
