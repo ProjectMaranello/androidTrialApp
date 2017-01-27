@@ -9,10 +9,13 @@ import com.loopj.android.http.RequestParams;
  */
 public class WatsonClient {
 
-    private static final String BASE_URL = "http://j4698t.messaging.internetofthings.ibmcloud.com:1883/api/v0002/device/types/Maranello_App/devices/pi0001/events";
+    //private static final String BASE_URL = "http://j4698t.messaging.internetofthings.ibmcloud.com:1883/api/v0002/device/types/Maranello_App/devices/app0001/events/event";
+    private static final String BASE_URL = "http://j4698t.messaging.internetofthings.ibmcloud.com:1883/api/v0002/device/types/Maranello_App/devices";
     private static AsyncHttpClient client = new AsyncHttpClient();
 
     public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+
+
         client.post(getAbsoluteUrl(url), params, responseHandler);
     }
 

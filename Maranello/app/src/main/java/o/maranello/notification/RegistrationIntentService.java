@@ -16,7 +16,7 @@ import java.io.IOException;
 import o.maranello.R;
 
 public class RegistrationIntentService extends IntentService {
-
+    public static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
 
@@ -27,6 +27,7 @@ public class RegistrationIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
 
         try {
             // [START register_for_gcm]
@@ -36,12 +37,13 @@ public class RegistrationIntentService extends IntentService {
             // See https://developers.google.com/cloud-messaging/android/start for details on this file.
             // [START get_token]
             InstanceID instanceID = InstanceID.getInstance(this);
-            String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
-                    GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
             Log.i(TAG, "GCM Registration Token: " + token);
-
-            // TODO: Implement this method to send any registration to your app's servers.
+            //Persist the token to the shared app context
+            SharedPreferences.Editor editor = sharedAppPreferences.edit();
+            editor.putString("gsmToken", token);
+            editor.commit();
             sendRegistrationToServer(token);
 
             // Subscribe to topic channels
