@@ -22,13 +22,16 @@ import o.maranello.notification.RegistrationIntentService;
 
 public class Welcome extends AppCompatActivity {
     private static final String TAG = "Welcome";
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private ProgressBar mRegistrationProgressBar;
     private TextView mInformationTextView;
     private boolean isReceiverRegistered;
 
+    /**
+     * Init the screen
+     * @param savedInstanceState saved instance data
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

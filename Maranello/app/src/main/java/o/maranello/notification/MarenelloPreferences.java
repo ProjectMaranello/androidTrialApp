@@ -2,6 +2,7 @@ package o.maranello.notification;
 
 /**
  * Created by kristianthornley on 27/11/16.
+ * Preference lookups
  */
 public class MarenelloPreferences {
 

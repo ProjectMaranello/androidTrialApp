@@ -27,8 +27,14 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.clients.ContractDetailsClient;
 import o.maranello.clients.RegisterClient;
 
+/**
+ * Created by kristianthornley on 27/01/17.
+ * A screen that captures the users contract data
+ */
 public class TestSettings extends AppCompatActivity {
     public static final String PREFS_NAME = "MaranelloPrefsFile";
+
+    //Screen references
     private EditText mBroadbandSupplierView;
     private EditText mPlanNameView;
     private EditText mCostPerMonthView;
@@ -36,10 +42,14 @@ public class TestSettings extends AppCompatActivity {
     private EditText mUploadSpeedView;
     private View mProgressView;
     private View mSettingsFormView;
+
+    //Used to block multiple tests from running at the same time
     private SubmitSettingsTask mSubmitSettingsTask = null;
 
-
-
+    /**
+     * Init the screen
+     * @param savedInstanceState saved instance data
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +105,7 @@ public class TestSettings extends AppCompatActivity {
         editor.putString("uploadSpeed",uploadSpeed);
 
         // Commit the edits!
-        editor.commit();
+        editor.apply();
 
         //Show progress bar
         showProgress(true);
@@ -206,10 +216,10 @@ public class TestSettings extends AppCompatActivity {
                         });
                     }
                 });
-            }catch (JSONException e){
+            } catch (JSONException e){
                 Log.e(TAG, "Exception in JSON");
-            }catch (UnsupportedEncodingException e2){
-                Log.e(TAG, "Exception in JSON");
+            } catch (UnsupportedEncodingException e2){
+                Log.e(TAG, "Exception in Encoding");
             }
             return true;
         }

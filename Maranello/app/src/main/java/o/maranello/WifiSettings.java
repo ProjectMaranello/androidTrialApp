@@ -10,12 +10,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-
+/**
+ * Created by kristianthornley on 27/01/17.
+ * Display a confirmation screen to the user for the selected wifi connection
+ */
 public class WifiSettings extends AppCompatActivity {
 
     private static final String TAG = "WifiSettings";
     public static final String PREFS_NAME = "MaranelloPrefsFile";
 
+    /**
+     * Init the screen
+     * @param savedInstanceState saved instance data
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +38,7 @@ public class WifiSettings extends AppCompatActivity {
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         TextView title = (TextView) findViewById( R.id.wifiDisplay );
+        //FIXME: resolve when we have a physical device
         title.setText("KT_HOME");
 
     }

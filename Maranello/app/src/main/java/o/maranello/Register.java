@@ -23,31 +23,20 @@ import android.widget.TextView;
 import org.json.*;
 import com.loopj.android.http.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cz.msebera.android.httpclient.Header;
 import o.maranello.clients.RegisterClient;
 
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
- * A login screen that offers login via email/password.
+ * Created by kristianthornley on 27/01/17.
+ * A login screen that offers login via user/password.
  */
 public class Register extends AppCompatActivity {
-    /**
-     * Common prefs file used throughout the project
-     */
+    private static final String TAG = "Register";
+
+    //Common prefs file used throughout the project
     public static final String PREFS_NAME = "MaranelloPrefsFile";
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
+    //Keep track of the login task to ensure we can cancel it if requested.
     private UserLoginTask mAuthTask = null;
 
     // UI references.
@@ -56,9 +45,16 @@ public class Register extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
 
+    //Error Message for the screen
     private String message;
+
+    /**
+     * Init the screen
+     * @param savedInstanceState saved instance data
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG,"Entry: onCreate");
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         message = intent.getStringExtra("message");
@@ -89,6 +85,10 @@ public class Register extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
     }
 
+    /**
+     * Sets the message if present
+     * @param savedInstanceState saved instance data
+     */
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -220,7 +220,7 @@ public class Register extends AppCompatActivity {
                             SharedPreferences.Editor editor = sharedAppPreferences.edit();
                             editor.putString("iotKey", response.getString("iotKey"));
                             editor.putString("deviceId", response.getString("deviceId"));
-                            editor.commit();
+                            editor.apply();
                             success = true;
                         }
                     }catch (JSONException e){

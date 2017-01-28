@@ -15,7 +15,13 @@ import java.io.IOException;
 
 import o.maranello.R;
 
+/**
+ * Created by kristianthornley on 27/11/16.
+ * Registers the device with Firebase returning GSM token
+ *
+ */
 public class RegistrationIntentService extends IntentService {
+    //Common prefs file used throughout the project
     public static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
@@ -24,26 +30,28 @@ public class RegistrationIntentService extends IntentService {
         super(TAG);
     }
 
+    /**
+     * Gets GSM token from Firebase
+     * @param intent application intent
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.i(TAG,"Entry: onHandleIntent");
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
 
         try {
-            // [START register_for_gcm]
             // Initially this call goes out to the network to retrieve the token, subsequent calls
             // are local.
             // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
             // See https://developers.google.com/cloud-messaging/android/start for details on this file.
-            // [START get_token]
             InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            // [END get_token]
             Log.i(TAG, "GCM Registration Token: " + token);
             //Persist the token to the shared app context
             SharedPreferences.Editor editor = sharedAppPreferences.edit();
             editor.putString("gsmToken", token);
-            editor.commit();
+            editor.apply();
             sendRegistrationToServer(token);
 
             // Subscribe to topic channels
@@ -63,6 +71,7 @@ public class RegistrationIntentService extends IntentService {
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent registrationComplete = new Intent(MarenelloPreferences.REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+        Log.i(TAG,"Exit: onHandleIntent");
     }
 
     /**
@@ -74,7 +83,9 @@ public class RegistrationIntentService extends IntentService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
+        Log.i(TAG,"Entry: sendRegistrationToServer");
         // Add custom implementation, as needed.
+        Log.i(TAG,"Exit: sendRegistrationToServer");
     }
 
     /**
@@ -83,13 +94,12 @@ public class RegistrationIntentService extends IntentService {
      * @param token GCM token
      * @throws IOException if unable to reach the GCM PubSub service
      */
-    // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
+        Log.i(TAG,"Entry: subscribeTopics");
         GcmPubSub pubSub = GcmPubSub.getInstance(this);
         for (String topic : TOPICS) {
             pubSub.subscribe(token, "/topics/" + topic, null);
         }
+        Log.i(TAG,"Exit: subscribeTopics");
     }
-    // [END subscribe_topics]
-
 }

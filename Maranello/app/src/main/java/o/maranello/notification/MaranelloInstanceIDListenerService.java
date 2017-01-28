@@ -9,6 +9,7 @@ import o.maranello.Welcome;
 
 /**
  * Created by kristianthornley on 27/11/16.
+ * Refreshes the GSM token form Firebase
  */
 public class MaranelloInstanceIDListenerService extends InstanceIDListenerService {
 

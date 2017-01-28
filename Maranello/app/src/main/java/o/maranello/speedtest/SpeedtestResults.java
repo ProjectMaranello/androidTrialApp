@@ -17,7 +17,7 @@ public class SpeedtestResults {
 
 
     public Double getDownloadSpeed() {
-        return downloadSpeed;
+        return round(downloadSpeed/1000, 2);
     }
 
     public void setDownloadSpeed(Double downloadSpeed) {
@@ -25,7 +25,7 @@ public class SpeedtestResults {
     }
 
     public Double getUploadSpeed() {
-        return uploadSpeed;
+        return round(uploadSpeed/1000,2);
     }
 
     public void setUploadSpeed(Double uploadSpeed) {
@@ -74,4 +74,15 @@ public class SpeedtestResults {
         System.out.println("Upload Speed: " + this.uploadSpeed);
 
     }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
+
 }
