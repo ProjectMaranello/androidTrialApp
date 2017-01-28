@@ -103,8 +103,6 @@ public class TestSettings extends AppCompatActivity {
         //create the task that's going to submit the data to the server
         mSubmitSettingsTask = new SubmitSettingsTask(settings.getString("deviceId",""), broadbandSupplier, planName, costPerMonth, downloadSpeed, uploadSpeed );
         mSubmitSettingsTask.execute((Void) null);
-        //Intent intent = new Intent(this, TestResults.class);
-        //startActivity(intent);
     }
 
     /**

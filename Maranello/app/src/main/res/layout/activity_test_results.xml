@@ -10,81 +10,104 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="o.maranello.TestResults">
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="10dp">
-        <TableRow android:padding="10dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/testresults.upload"
-                android:id="@+id/uploadLabel" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/uploadValue"
-                android:layout_column="2" />
-        </TableRow>
-        <TableRow android:padding="10dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/testresults.download"
-                android:id="@+id/downloadLabel" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/downloadValue"
-                android:layout_column="2" />
-        </TableRow>
-        <TableRow android:padding="10dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/testresults.ping"
-                android:id="@+id/pingLabel" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/pingValue"
-                android:layout_column="2" />
-        </TableRow>
-        <TableRow android:padding="10dp"
-            android:measureWithLargestChild="false">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/testresults.automatedTestStatus"
-                android:id="@+id/automatedTestStatusLabel"
-                android:paddingEnd="20dp"
-                android:paddingStart="0dp"/>
-
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New ToggleButton"
-                android:id="@+id/automatedTestStatusValue" />
-
-
-        </TableRow>
-    </TableLayout>
-
-
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/testresults.testAgain"
-        android:id="@+id/button"
-        android:onClick="retry"
-        android:layout_marginTop="98dp" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/message"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
+    <ProgressBar
+        android:id="@+id/test_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+    <ScrollView
+        android:id="@+id/test_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/test_results_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:padding="10dp">
+                <TableRow android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/testresults.upload"
+                        android:id="@+id/uploadLabel" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/uploadValue"
+                        android:layout_column="2" />
+                </TableRow>
+                <TableRow android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/testresults.download"
+                        android:id="@+id/downloadLabel" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/downloadValue"
+                        android:layout_column="2" />
+                </TableRow>
+                <TableRow android:padding="10dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/testresults.ping"
+                        android:id="@+id/pingLabel" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/pingValue"
+                        android:layout_column="2" />
+                </TableRow>
+                <TableRow android:padding="10dp"
+                    android:measureWithLargestChild="false">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/testresults.automatedTestStatus"
+                        android:id="@+id/automatedTestStatusLabel"
+                        android:paddingEnd="20dp"
+                        android:paddingStart="0dp"/>
+
+                    <ToggleButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New ToggleButton"
+                        android:id="@+id/automatedTestStatusValue" />
+
+                </TableRow>
+            </TableLayout>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/testresults.testAgain"
+                android:id="@+id/button"
+                android:onClick="retry"
+                android:layout_marginTop="16dp" />
+        </LinearLayout>
+    </ScrollView>
+
+
 </LinearLayout>
