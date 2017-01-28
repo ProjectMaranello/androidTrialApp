@@ -52,6 +52,9 @@ public class MaranelloGcmListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
         SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
+        if (mSubmitResultsTask != null) {
+            return;
+        }
         new RunTest().execute();
     }
     // [END receive_message]
