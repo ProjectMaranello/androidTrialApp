@@ -69,10 +69,10 @@ public class TestSettings extends AppCompatActivity {
         mCostPerMonthView.setText(settings.getString("costPerMonth",""));
 
         mDownloadSpeedView = (EditText) findViewById(R.id.downloadSpeed);
-        mDownloadSpeedView.setText(settings.getString("downloadSpeed",""));
+        mDownloadSpeedView.setText(settings.getString("contractDownloadSpeed", ""));
 
         mUploadSpeedView = (EditText) findViewById(R.id.uploadSpeed);
-        mUploadSpeedView.setText(settings.getString("uploadSpeed",""));
+        mUploadSpeedView.setText(settings.getString("contractUploadSpeed", ""));
 
         //Get the form view
         mSettingsFormView = findViewById(R.id.settings_form);
@@ -106,10 +106,10 @@ public class TestSettings extends AppCompatActivity {
         editor.putString("costPerMonth",costPerMonth);
         mDownloadSpeedView.setError(null);
         String downloadSpeed = mDownloadSpeedView.getText().toString();
-        editor.putString("downloadSpeed",downloadSpeed);
+        editor.putString("contractDownloadSpeed", downloadSpeed);
         mUploadSpeedView.setError(null);
         String uploadSpeed = mUploadSpeedView.getText().toString();
-        editor.putString("uploadSpeed",uploadSpeed);
+        editor.putString("contractUploadSpeed", uploadSpeed);
 
         // Commit the edits!
         editor.apply();
