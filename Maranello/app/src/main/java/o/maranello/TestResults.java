@@ -60,7 +60,7 @@ public class TestResults extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         //Set the Automated toggle
         mTestOn = (ToggleButton) findViewById(R.id.automatedTestStatusValue);
-        mTestOn.setChecked(settings.getBoolean("testOn",true));
+        mTestOn.setChecked(settings.getBoolean("testOn", false));
         mTestOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
