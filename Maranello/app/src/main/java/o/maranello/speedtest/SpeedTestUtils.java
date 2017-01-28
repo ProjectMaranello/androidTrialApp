@@ -14,6 +14,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Created by kristianthornley on 30/11/16.
+ * Utils for handling speedtest functions
  */
 public class SpeedTestUtils {
 
@@ -45,7 +46,7 @@ public class SpeedTestUtils {
     }
 
     public static Map<String, String> nodeListToMap(NodeList nodeList){
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         for (int i = 0 ; i < nodeList.getLength(); i++){
             Node node = nodeList.item(i);
             map.put(node.getNodeName(),node.getNodeValue());
@@ -95,9 +96,7 @@ public class SpeedTestUtils {
         );
 
         Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        Double d = radius * c;
-
-        return d;
+        return radius * c;
 
     }
 }

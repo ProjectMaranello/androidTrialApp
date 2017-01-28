@@ -1,13 +1,13 @@
 package o.maranello.speedtest;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by kristianthornley on 3/12/16.
+ * produces threads to test upload speed
  */
 public class UploadProducer implements Runnable {
 
@@ -32,7 +32,7 @@ public class UploadProducer implements Runnable {
                 HTTPUploader downloader = new HTTPUploader(request.getKey(), request.getValue(), start, timeout);
                 Thread thread = new Thread(downloader);
                 thread.start();
-                Map<HTTPUploader,Thread> map = new HashMap<HTTPUploader,Thread>();
+                Map<HTTPUploader, Thread> map = new HashMap<>();
                 map.put(downloader, thread);
                 queue.put(map);
             } catch (InterruptedException e) {

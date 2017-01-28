@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by kristianthornley on 3/12/16.
+ * runnable download test
  */
 public class DownloadConsumer implements Runnable{
 

@@ -8,13 +8,14 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by kristianthornley on 3/12/16.
+ * produces threads to test download speed
  */
 public class DownloadProducer implements Runnable {
 
     private BlockingQueue<Map<HTTPDownloader,Thread>> queue;
     private ArrayList<HttpURLConnection> requests;
-    private Long timeout;
-    private Long start;
+    private Long timeout = Long.valueOf(0);
+    private Long start = Long.valueOf(0);
     public DownloadProducer(BlockingQueue<Map<HTTPDownloader,Thread>> q, ArrayList<HttpURLConnection> requests, Integer requestCount, Long timeout, Long start){
         this.queue=q;
         this.requests = requests;
@@ -29,7 +30,7 @@ public class DownloadProducer implements Runnable {
                 HTTPDownloader downloader = new HTTPDownloader(request, start, timeout);
                 Thread thread = new Thread(downloader);
                 thread.start();
-                Map<HTTPDownloader,Thread> map = new HashMap<HTTPDownloader,Thread>();
+                Map<HTTPDownloader, Thread> map = new HashMap<>();
                 map.put(downloader, thread);
                 queue.put(map);
             } catch (InterruptedException e) {

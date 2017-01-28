@@ -1,6 +1,5 @@
 package o.maranello.speedtest;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,6 +14,14 @@ public class SpeedtestResults {
     private Long bytesSent;
     private Long bytesReceived;
 
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
 
     public Double getDownloadSpeed() {
         return round(downloadSpeed/1000, 2);
@@ -64,24 +71,16 @@ public class SpeedtestResults {
         this.bytesReceived = bytesReceived;
     }
 
-    public void dump(){
+    public String dump() {
+        StringBuilder buffer = new StringBuilder();
 
-        System.out.println("Using Server: " + this.server.get("name"));
-        System.out.println("Ping: " + this.ping);
-        System.out.println("Bytes Received: " + this.bytesReceived);
-        System.out.println("Download Speed: " + this.downloadSpeed);
-        System.out.println("Bytes Sent: " + this.bytesSent);
-        System.out.println("Upload Speed: " + this.uploadSpeed);
-
-    }
-
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
+        buffer.append("Using Server: " + this.server.get("name"));
+        buffer.append("Ping: " + this.ping);
+        buffer.append("Bytes Received: " + this.bytesReceived);
+        buffer.append("Download Speed: " + this.downloadSpeed);
+        buffer.append("Bytes Sent: " + this.bytesSent);
+        buffer.append("Upload Speed: " + this.uploadSpeed);
+        return buffer.toString();
     }
 
 

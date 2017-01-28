@@ -10,7 +10,6 @@ public class HTTPUploaderData {
     private Integer length;
     private Integer start;
     private Integer timeout;
-    private Integer[] total = {0};
     private String data;
 
     public HTTPUploaderData(Integer length, Integer start, Integer timeout){
@@ -20,11 +19,14 @@ public class HTTPUploaderData {
         this.data = null;
     }
 
+    /**
+     * Creates data to upload
+     */
     public void createData(){
         String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Long multiplier = Math.round(this.length / 36.0);
         String repeated = new String(new char[(int)(long)multiplier]).replace("\0",chars);
-        StringBuffer payload = new StringBuffer();
+        StringBuilder payload = new StringBuilder();
         payload.append("content1=");
         payload.append(repeated.substring(0,repeated.length()-9));
         data = payload.toString();

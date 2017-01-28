@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.clients.ContractDetailsClient;
-import o.maranello.clients.RegisterClient;
 
 /**
  * Created by kristianthornley on 27/01/17.
@@ -33,6 +32,7 @@ import o.maranello.clients.RegisterClient;
  */
 public class TestSettings extends AppCompatActivity {
     public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String TAG = "TestSettings";
 
     //Screen references
     private EditText mBroadbandSupplierView;
@@ -52,6 +52,7 @@ public class TestSettings extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "Entry: onCreate");
         super.onCreate(savedInstanceState);
         //Set the view layout
         setContentView(R.layout.activity_test_settings);
@@ -77,10 +78,16 @@ public class TestSettings extends AppCompatActivity {
         mSettingsFormView = findViewById(R.id.settings_form);
         //Get the progress bar
         mProgressView = findViewById(R.id.settings_progress);
-
+        Log.i(TAG, "Exit: onCreate");
     }
 
+    /**
+     * Submit the plan info
+     *
+     * @param view button that was clicked
+     */
     public void submit(View view) {
+        Log.i(TAG, "Entry: submit");
         //Check there is not already a background task running
         if (mSubmitSettingsTask != null) {
             return;
@@ -113,6 +120,7 @@ public class TestSettings extends AppCompatActivity {
         //create the task that's going to submit the data to the server
         mSubmitSettingsTask = new SubmitSettingsTask(settings.getString("deviceId",""), broadbandSupplier, planName, costPerMonth, downloadSpeed, uploadSpeed );
         mSubmitSettingsTask.execute((Void) null);
+        Log.i(TAG, "Exit: submit");
     }
 
     /**
@@ -151,6 +159,9 @@ public class TestSettings extends AppCompatActivity {
         }
     }
 
+    /**
+     * Submits the data to the server
+     */
     public class SubmitSettingsTask extends AsyncTask<Void, Void, Boolean> {
         private static final String TAG = "SubmitSettingsTask";
         private final String mDeviceId;
@@ -159,16 +170,36 @@ public class TestSettings extends AppCompatActivity {
         private final String mCostPerMonth;
         private final String mDownloadSpeed;
         private final String mUploadSpeed;
+
+        /**
+         * Construct with ui data
+         *
+         * @param deviceId          the device id
+         * @param broadbandSupplier the broadband supplier
+         * @param planName          the plan name
+         * @param costPerMonth      the cost per month
+         * @param downloadSpeed     the download speed
+         * @param uploadSpeed       the upload speed
+         */
         SubmitSettingsTask(String deviceId, String broadbandSupplier, String planName, String costPerMonth, String downloadSpeed, String uploadSpeed) {
+            Log.i(TAG, "Entry: construct");
             mDeviceId = deviceId;
             mBroadbandSupplier = broadbandSupplier;
             mPlanName = planName;
             mCostPerMonth = costPerMonth;
             mDownloadSpeed = downloadSpeed;
             mUploadSpeed = uploadSpeed;
+            Log.i(TAG, "Exit: construct");
         }
 
+        /**
+         * Another Async thread to post info to Service
+         *
+         * @param params parameters for the task
+         * @return state
+         */
         protected Boolean doInBackground(Void... params) {
+            Log.i(TAG, "Entry: doInBackground");
             RequestParams requestParams = new RequestParams();
             JSONObject jsonParams = new JSONObject();
             try {
@@ -221,6 +252,7 @@ public class TestSettings extends AppCompatActivity {
             } catch (UnsupportedEncodingException e2){
                 Log.e(TAG, "Exception in Encoding");
             }
+            Log.i(TAG, "Exit: doInBackground");
             return true;
         }
 

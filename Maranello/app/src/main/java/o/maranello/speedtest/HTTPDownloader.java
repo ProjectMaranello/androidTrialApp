@@ -7,11 +7,11 @@ import java.net.HttpURLConnection;
 
 /**
  * Created by kristianthornley on 28/11/16.
+ * The actual downloader
+ *
  */
 public class HTTPDownloader implements Runnable {
-    /*
-    Thread class for retrieving a URL
-     */
+    //Thread class for retrieving a URL
     private HttpURLConnection request;
     private Long start;
     private Long timeout;
@@ -25,16 +25,13 @@ public class HTTPDownloader implements Runnable {
 
     @Override
     public void run() {
-        int current = 0;
+        int current;
         SpeedTestUtils.catchRequest(request, null);
         InputStream input = SpeedTestUtils.getResponseStream(request);
         BufferedInputStream buffer = new BufferedInputStream(input);
         byte[] bufferLimit = new byte[10240];
         try {
             while ((current = buffer.read(bufferLimit)) != -1) {
-
-                //System.out.println(current);
-
                 result += Long.valueOf(current);
             }
         } catch (IOException e) {

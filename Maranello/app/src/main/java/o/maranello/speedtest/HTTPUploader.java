@@ -7,11 +7,11 @@ import java.net.HttpURLConnection;
 
 /**
  * Created by kristianthornley on 28/11/16.
+ * The actual uploader
  */
 public class HTTPUploader implements Runnable {
-    /*
-    Thread class for retrieving a URL
-     */
+
+    //Thread class for retrieving a URL
     private HttpURLConnection request;
     private HTTPUploaderData data;
     private Long start;
@@ -27,15 +27,13 @@ public class HTTPUploader implements Runnable {
 
     @Override
     public void run() {
-        int current = 0;
+        int current;
         SpeedTestUtils.catchRequest(request, data.getData());
         InputStream input = SpeedTestUtils.getResponseStream(request);
         BufferedInputStream buffer = new BufferedInputStream(input);
         byte[] bufferLimit = new byte[10240];
         try {
-            //System.out.println(request.getResponseCode());
             while ((current = buffer.read(bufferLimit)) != -1) {
-                //System.out.println(data.getData().length());
                 result += Long.valueOf(current);
             }
         } catch (IOException e) {

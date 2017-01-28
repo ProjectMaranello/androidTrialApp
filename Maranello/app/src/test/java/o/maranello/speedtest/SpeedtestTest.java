@@ -2,19 +2,15 @@ package o.maranello.speedtest;
 
 import android.util.Log;
 
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ArrayBlockingQueue;
-import static org.junit.Assert.assertEquals;
-
 /**
- * Test class ofr the speedtest port
+ * Test class of the speedtest port
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Log.class})
@@ -72,7 +68,7 @@ public class SpeedtestTest {
     public void runTest_isCorrect() throws Exception {
         Speedtest test = new Speedtest();
         SpeedtestResults results = test.runTest();
-        results.dump();
+        System.out.println(results.dump());
 
 
     }

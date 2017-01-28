@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -34,6 +34,7 @@ public class Welcome extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "Entry: onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
@@ -62,19 +63,32 @@ public class Welcome extends AppCompatActivity {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
+        Log.i(TAG, "Exit: onCreate");
     }
 
+    /**
+     * Navigate to next view
+     *
+     * @param view the event
+     */
     public void register(View view) {
+        Log.i(TAG, "Entry: register");
         Intent intent = new Intent(this, Register.class);
         startActivity(intent);
+        Log.i(TAG, "Exit: register");
     }
 
-    private void registerReceiver(){
+    /**
+     * Register the GSM service
+     */
+    private void registerReceiver() {
+        Log.i(TAG, "Entry: registerReceiver");
         if(!isReceiverRegistered) {
             LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                     new IntentFilter(MarenelloPreferences.REGISTRATION_COMPLETE));
             isReceiverRegistered = true;
         }
+        Log.i(TAG, "Exit: registerReceiver");
     }
 
     /**
@@ -83,6 +97,7 @@ public class Welcome extends AppCompatActivity {
      * the Google Play Store or enable it in the device's system settings.
      */
     private boolean checkPlayServices() {
+        Log.i(TAG, "Entry: checkPlayServices");
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -93,8 +108,10 @@ public class Welcome extends AppCompatActivity {
                 Log.i(TAG, "This device is not supported.");
                 finish();
             }
+            Log.i(TAG, "Exit: checkPlayServices");
             return false;
         }
+        Log.i(TAG, "Exit: checkPlayServices");
         return true;
     }
 }
