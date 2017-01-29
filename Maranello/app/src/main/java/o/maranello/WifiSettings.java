@@ -2,6 +2,7 @@ package o.maranello;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ public class WifiSettings extends AppCompatActivity {
 
     public static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "WifiSettings";
-
+    private String ssid;
     /**
      * Init the screen
      * @param savedInstanceState saved instance data
@@ -29,26 +30,14 @@ public class WifiSettings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
-        WifiInfo info = wifiManager.getConnectionInfo ();
-        String ssid  = info.getSSID();
+        WifiInfo info = wifiManager.getConnectionInfo();
+        ssid = info.getSSID();
         Log.d(TAG, "SSID=" + ssid);
         setContentView(R.layout.activity_wifi_settings);
-        Log.i(TAG, "Exit: onCreate");
-    }
+        TextView title = (TextView) findViewById(R.id.wifiDisplay);
+        title.setText(ssid);
 
-    /**
-     * Report the WififSettings if present
-     *
-     * @param savedInstanceState saved instance data
-     */
-    @Override
-    public void onPostCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "Entry: onPostCreate");
-        super.onPostCreate(savedInstanceState);
-        TextView title = (TextView) findViewById( R.id.wifiDisplay );
-        //FIXME: resolve when we have a physical device
-        title.setText("KT_HOME");
-        Log.i(TAG, "Exit: onPostCreate");
+        Log.i(TAG, "Exit: onCreate");
     }
 
     /**
@@ -71,6 +60,12 @@ public class WifiSettings extends AppCompatActivity {
      */
     public void confirm(View view) {
         Log.i(TAG, "Entry: confirm");
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("ssid", ssid);
+        editor.apply();
+
         Intent intent = new Intent(this, TestSettings.class);
         startActivity(intent);
         Log.i(TAG, "Entry: confirm");

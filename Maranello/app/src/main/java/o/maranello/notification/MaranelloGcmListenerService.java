@@ -1,6 +1,9 @@
 package o.maranello.notification;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,10 +29,9 @@ import o.maranello.speedtest.SpeedtestResults;
  *
  */
 public class MaranelloGcmListenerService extends GcmListenerService {
-    private static final String TAG = "MaranelloGcmListenerSev";
-
     //Common prefs file used throughout the project
     public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String TAG = "MaranelloGcmListenerSev";
     //Used to block multiple tests from running at the same time
     private SubmitResultsTask mSubmitResultsTask = null;
 
@@ -47,6 +49,12 @@ public class MaranelloGcmListenerService extends GcmListenerService {
         String message = data.getString("message");
         Log.d(TAG, "Message From: " + from);
         Log.d(TAG, "Message Is: " + message);
+
+        //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        String currentSSID = info.getSSID();
+
         if("runtest".equalsIgnoreCase(message)){
             SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
             if (mSubmitResultsTask != null) {
@@ -55,10 +63,16 @@ public class MaranelloGcmListenerService extends GcmListenerService {
             }
             //If the test is enabled run the test otherwise the user has indicated that it should be turned off
             if(sharedAppPreferences.getBoolean("testOn",false)){
-                new RunTest().execute();
+                if (sharedAppPreferences.getString("ssid", "").equalsIgnoreCase(currentSSID)) {
+                    new RunTest().execute();
+                } else {
+                    Log.d(TAG, "Wrong SSID");
+                }
             }else{
                 Log.d(TAG, "Test disabled");
             }
+
+
         }else {
             Log.d(TAG, "Message was not runtest");
         }

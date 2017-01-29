@@ -5,11 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,8 +19,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.json.*;
-import com.loopj.android.http.*;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 import o.maranello.clients.RegisterClient;
@@ -31,11 +33,9 @@ import o.maranello.clients.RegisterClient;
  * A login screen that offers login via user/password.
  */
 public class Register extends AppCompatActivity {
-    private static final String TAG = "Register";
-
     //Common prefs file used throughout the project
     public static final String PREFS_NAME = "MaranelloPrefsFile";
-
+    private static final String TAG = "Register";
     //Keep track of the login task to ensure we can cancel it if requested.
     private UserLoginTask mAuthTask = null;
 
@@ -244,6 +244,7 @@ public class Register extends AppCompatActivity {
                 }
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable exception, JSONObject response){
+                    Log.e(TAG, "Register failed: " + exception);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

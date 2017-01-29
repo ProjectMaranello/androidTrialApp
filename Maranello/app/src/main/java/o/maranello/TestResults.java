@@ -3,7 +3,10 @@ package o.maranello;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -103,14 +106,24 @@ public class TestResults extends AppCompatActivity {
     public void retry(View view) {
         Log.i(TAG,"Entry: retry");
         SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
+
+        //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        String currentSSID = info.getSSID();
+
         if (mSubmitResultsTask != null) {
             Log.d(TAG, "Test is already running");
             return;
         }
         //If the test is enabled run the test otherwise the user has indicated that it should be turned off
         if(sharedAppPreferences.getBoolean("testOn",false)){
-            showProgress(true);
-            new RunTest().execute();
+            if (sharedAppPreferences.getString("ssid", "").equalsIgnoreCase(currentSSID)) {
+                showProgress(true);
+                new RunTest().execute();
+            } else {
+                Log.d(TAG, "Wrong SSID");
+            }
         }else{
             Log.d(TAG, "Test disabled");
         }
