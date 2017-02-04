@@ -22,7 +22,7 @@ import o.maranello.R;
  */
 public class RegistrationIntentService extends IntentService {
     //Common prefs file used throughout the project
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "RegIntentService";
     private static final String[] TOPICS = {"global"};
 
@@ -52,7 +52,7 @@ public class RegistrationIntentService extends IntentService {
             SharedPreferences.Editor editor = sharedAppPreferences.edit();
             editor.putString("gsmToken", token);
             editor.apply();
-            sendRegistrationToServer(token);
+            sendRegistrationToServer();
 
             // Subscribe to topic channels
             subscribeTopics(token);
@@ -80,9 +80,8 @@ public class RegistrationIntentService extends IntentService {
      * Modify this method to associate the user's GCM registration token with any server-side account
      * maintained by your application.
      *
-     * @param token The new token.
      */
-    private void sendRegistrationToServer(String token) {
+    private void sendRegistrationToServer() {
         Log.i(TAG,"Entry: sendRegistrationToServer");
         // Add custom implementation, as needed.
         Log.i(TAG,"Exit: sendRegistrationToServer");

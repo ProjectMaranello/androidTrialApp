@@ -17,7 +17,7 @@ import android.widget.TextView;
  */
 public class WifiSettings extends AppCompatActivity {
 
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "WifiSettings";
     private String ssid;
     /**
@@ -43,9 +43,8 @@ public class WifiSettings extends AppCompatActivity {
     /**
      * If no Wifi then present error
      *
-     * @param view the event item
      */
-    public void error(View view) {
+    public void error(@SuppressWarnings("UnusedParameters") View view) {
         Log.i(TAG, "Entry: error");
         Intent intent = new Intent(this, Register.class);
         intent.putExtra("message","WIFI Not Enabled");
@@ -56,9 +55,8 @@ public class WifiSettings extends AppCompatActivity {
     /**
      * User confirms the Wifi
      *
-     * @param view the event item
      */
-    public void confirm(View view) {
+    public void confirm(@SuppressWarnings("UnusedParameters") View view) {
         Log.i(TAG, "Entry: confirm");
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -70,4 +68,5 @@ public class WifiSettings extends AppCompatActivity {
         startActivity(intent);
         Log.i(TAG, "Entry: confirm");
     }
+
 }

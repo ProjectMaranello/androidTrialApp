@@ -1,8 +1,8 @@
 package o.maranello.clients;
-import com.loopj.android.http.SyncHttpClient;
-import com.loopj.android.http.AsyncHttpClient;
+
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 
 /**
  * Created by kristianthornley on 27/01/17.
@@ -11,10 +11,9 @@ import com.loopj.android.http.RequestParams;
  * Returned is the iot token for auth to watson
  */
 public class RegisterClient {
-    private static final String TAG = "RegisterClient";
 
     private static final String BASE_URL = "http://maranelloeventprocessor.mybluemix.net/app/register";
-    private static SyncHttpClient client = new SyncHttpClient();
+    private static final SyncHttpClient client = new SyncHttpClient();
 
     /**
      * Log Client in and retrieve IOT Token

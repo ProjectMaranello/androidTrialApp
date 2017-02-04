@@ -10,17 +10,13 @@ import java.net.HttpURLConnection;
  * The actual downloader
  *
  */
-public class HTTPDownloader implements Runnable {
+class HTTPDownloader implements Runnable {
     //Thread class for retrieving a URL
-    private HttpURLConnection request;
-    private Long start;
-    private Long timeout;
-    private Long result = Long.valueOf(0);
+    private final HttpURLConnection request;
+    private Long result = 0L;
 
-    public HTTPDownloader(HttpURLConnection request, long start, long timeout){
+    public HTTPDownloader(HttpURLConnection request) {
         this.request = request;
-        this.start = start;
-        this.timeout = timeout;
     }
 
     @Override
@@ -32,10 +28,20 @@ public class HTTPDownloader implements Runnable {
         byte[] bufferLimit = new byte[10240];
         try {
             while ((current = buffer.read(bufferLimit)) != -1) {
-                result += Long.valueOf(current);
+                result += (long) current;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                buffer.close();
+                input.close();
+                if (this.request != null) {
+                    this.request.disconnect();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

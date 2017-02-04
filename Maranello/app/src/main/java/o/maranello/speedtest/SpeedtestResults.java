@@ -14,17 +14,15 @@ public class SpeedtestResults {
     private Long bytesSent;
     private Long bytesReceived;
 
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        long factor = (long) Math.pow(10, places);
+    private static double round(double value) {
+        long factor = (long) Math.pow(10, 2);
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
     }
 
     public Double getDownloadSpeed() {
-        return round(downloadSpeed/1000, 2);
+        return round(downloadSpeed / 1000);
     }
 
     public void setDownloadSpeed(Double downloadSpeed) {
@@ -32,7 +30,7 @@ public class SpeedtestResults {
     }
 
     public Double getUploadSpeed() {
-        return round(uploadSpeed/1000,2);
+        return round(uploadSpeed / 1000);
     }
 
     public void setUploadSpeed(Double uploadSpeed) {
@@ -47,24 +45,12 @@ public class SpeedtestResults {
         this.ping = ping;
     }
 
-    public Map<String, String> getServer() {
-        return server;
-    }
-
     public void setServer(Map<String, String> server) {
         this.server = server;
     }
 
-    public Long getBytesSent() {
-        return bytesSent;
-    }
-
     public void setBytesSent(Long bytesSent) {
         this.bytesSent = bytesSent;
-    }
-
-    public Long getBytesReceived() {
-        return bytesReceived;
     }
 
     public void setBytesReceived(Long bytesReceived) {
@@ -72,16 +58,15 @@ public class SpeedtestResults {
     }
 
     public String dump() {
-        StringBuilder buffer = new StringBuilder();
+        String buffer = "";
 
-        buffer.append("Using Server: " + this.server.get("name"));
-        buffer.append("Ping: " + this.ping);
-        buffer.append("Bytes Received: " + this.bytesReceived);
-        buffer.append("Download Speed: " + this.downloadSpeed);
-        buffer.append("Bytes Sent: " + this.bytesSent);
-        buffer.append("Upload Speed: " + this.uploadSpeed);
-        return buffer.toString();
+        buffer += "Using Server: " + this.server.get("name");
+        buffer += "Ping: " + this.ping;
+        buffer += "Bytes Received: " + this.bytesReceived;
+        buffer += "Download Speed: " + this.downloadSpeed;
+        buffer += "Bytes Sent: " + this.bytesSent;
+        buffer += "Upload Speed: " + this.uploadSpeed;
+        return buffer;
     }
-
 
 }

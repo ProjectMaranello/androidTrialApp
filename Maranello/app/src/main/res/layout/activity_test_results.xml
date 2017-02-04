@@ -11,11 +11,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="o.maranello.TestResults">
     <TextView
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/message"
         android:layout_gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:visibility="gone" />
     <ProgressBar
         android:id="@+id/test_progress"
@@ -29,7 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/test_results_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -42,70 +41,67 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="@string/testresults.upload"
-                        android:id="@+id/uploadLabel" />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:id="@+id/uploadValue"
-                        android:layout_column="2" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="2"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                 </TableRow>
                 <TableRow android:padding="10dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="@string/testresults.download"
-                        android:id="@+id/downloadLabel" />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                     <TextView
+                        android:id="@+id/downloadValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:id="@+id/downloadValue"
-                        android:layout_column="2" />
+                        android:layout_column="2"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                 </TableRow>
                 <TableRow android:padding="10dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:text="@string/testresults.ping"
-                        android:id="@+id/pingLabel" />
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:id="@+id/pingValue"
-                        android:layout_column="2" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="2"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
                 </TableRow>
-                <TableRow android:padding="10dp"
-                    android:measureWithLargestChild="false">
+
+                <TableRow
+                    android:measureWithLargestChild="false"
+                    android:padding="10dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="@string/testresults.automatedTestStatus"
-                        android:id="@+id/automatedTestStatusLabel"
                         android:paddingEnd="20dp"
-                        android:paddingStart="0dp"/>
+                        android:paddingStart="0dp"
+                        android:text="@string/testresults.automatedTestStatus"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <ToggleButton
+                        android:id="@+id/automatedTestStatusValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="New ToggleButton"
-                        android:id="@+id/automatedTestStatusValue" />
+                        android:text="New ToggleButton" />
 
                 </TableRow>
             </TableLayout>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/testresults.testAgain"
-                android:id="@+id/button"
+                android:layout_marginTop="16dp"
                 android:onClick="retry"
-                android:layout_marginTop="16dp" />
+                android:text="@string/testresults.testAgain" />
         </LinearLayout>
     </ScrollView>
 

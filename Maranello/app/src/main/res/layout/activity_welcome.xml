@@ -12,7 +12,6 @@
     tools:context="o.maranello.Welcome">
 
     <TextView
-        android:id="@+id/heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
@@ -23,7 +22,6 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tagline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -46,7 +44,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
     <Button
-        android:id="@+id/register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
@@ -55,7 +52,6 @@
         android:textStyle="bold"/>
 
     <Button
-        android:id="@+id/about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

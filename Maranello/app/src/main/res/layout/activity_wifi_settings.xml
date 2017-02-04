@@ -15,19 +15,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/wifisettings.question"
-        android:id="@+id/confirmText"
         android:layout_marginTop="24dp"
-        android:textAlignment="center" />
+        android:text="@string/wifisettings.question"
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
+        android:id="@+id/wifiDisplay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/wifiDisplay"
         android:layout_marginTop="24dp"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <GridLayout
         android:layout_width="match_parent"
@@ -35,20 +34,18 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/wifisettings.yes"
-            android:id="@+id/confirm"
-            android:onClick="confirm"
             android:layout_gravity="start"
-            android:layout_marginStart="50dp" />
+            android:layout_marginStart="50dp"
+            android:onClick="confirm"
+            android:text="@string/wifisettings.yes" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/wifisettings.no"
-            android:id="@+id/error"
-            android:onClick="error"
             android:layout_gravity="end"
-            android:layout_marginEnd="50dp" />
+            android:layout_marginEnd="50dp"
+            android:onClick="error"
+            android:text="@string/wifisettings.no" />
 
     </GridLayout>
 

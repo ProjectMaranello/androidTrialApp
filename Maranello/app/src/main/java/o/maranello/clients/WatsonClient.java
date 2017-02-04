@@ -3,9 +3,7 @@ package o.maranello.clients;
 import android.content.Context;
 import android.util.Log;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -19,7 +17,7 @@ public class WatsonClient {
     private static final String TAG = "WatsonClient";
 
     private static final String BASE_URL = "http://j4698t.messaging.internetofthings.ibmcloud.com:1883/api/v0002/device/types/Maranello_App/devices/";
-    private static SyncHttpClient client = new SyncHttpClient();
+    private static final SyncHttpClient client = new SyncHttpClient();
 
     /**
      * Post result data to watson

@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +30,7 @@ import o.maranello.clients.ContractDetailsClient;
  * A screen that captures the users contract data
  */
 public class TestSettings extends AppCompatActivity {
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "TestSettings";
 
     //Screen references
@@ -84,9 +83,8 @@ public class TestSettings extends AppCompatActivity {
     /**
      * Submit the plan info
      *
-     * @param view button that was clicked
      */
-    public void submit(View view) {
+    public void submit(@SuppressWarnings("UnusedParameters") View view) {
         Log.i(TAG, "Entry: submit");
         //Check there is not already a background task running
         if (mSubmitSettingsTask != null) {
@@ -200,7 +198,6 @@ public class TestSettings extends AppCompatActivity {
          */
         protected Boolean doInBackground(Void... params) {
             Log.i(TAG, "Entry: doInBackground");
-            RequestParams requestParams = new RequestParams();
             JSONObject jsonParams = new JSONObject();
             try {
                 jsonParams.put("deviceId", mDeviceId);

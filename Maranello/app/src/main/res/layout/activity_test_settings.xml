@@ -11,11 +11,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="o.maranello.TestSettings">
     <TextView
+        android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/message"
         android:layout_gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:visibility="gone" />
     <ProgressBar
         android:id="@+id/settings_progress"
@@ -30,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
-            android:id="@+id/test_settings_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -43,9 +42,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/testsettings.broadbandSupplier"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -57,9 +55,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/testsettings.planName"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -71,9 +68,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/testsettings.costPerMonth"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="numberDecimal" />
+                    android:inputType="numberDecimal"
+                    android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -85,9 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/testsettings.downloadSpeed"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="number|text" />
+                    android:inputType="number|text"
+                    android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -99,19 +94,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/testsettings.uploadSpeed"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="number|text" />
+                    android:inputType="number|text"
+                    android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:id="@+id/button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/testsettings.enter"
                 android:onClick="submit"
+                android:text="@string/testsettings.enter"
                 android:textStyle="bold" />
 
 

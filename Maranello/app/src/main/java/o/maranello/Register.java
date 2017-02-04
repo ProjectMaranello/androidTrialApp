@@ -34,7 +34,7 @@ import o.maranello.clients.RegisterClient;
  */
 public class Register extends AppCompatActivity {
     //Common prefs file used throughout the project
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "Register";
     //Keep track of the login task to ensure we can cancel it if requested.
     private UserLoginTask mAuthTask = null;

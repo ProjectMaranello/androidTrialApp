@@ -5,17 +5,13 @@ package o.maranello.speedtest;
  * File like object to improve cutting off the upload once the timeout
  * has been reached
  */
-public class HTTPUploaderData {
+class HTTPUploaderData {
 
-    private Integer length;
-    private Integer start;
-    private Integer timeout;
+    private final Integer length;
     private String data;
 
-    public HTTPUploaderData(Integer length, Integer start, Integer timeout){
+    public HTTPUploaderData(Integer length) {
         this.length = length;
-        this.start = start;
-        this.timeout = timeout;
         this.data = null;
     }
 
@@ -26,13 +22,15 @@ public class HTTPUploaderData {
         String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Long multiplier = Math.round(this.length / 36.0);
         String repeated = new String(new char[(int)(long)multiplier]).replace("\0",chars);
-        StringBuilder payload = new StringBuilder();
-        payload.append("content1=");
-        payload.append(repeated.substring(0,repeated.length()-9));
-        data = payload.toString();
+        data = "";
+        data += "content1=";
+        data += repeated.substring(0, repeated.length() - 9);
     }
     public String getData(){
         return this.data;
     }
 
+    public void destroy() {
+        this.data = null;
+    }
 }

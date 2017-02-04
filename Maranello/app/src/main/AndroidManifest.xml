@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="o.maranello" >
 
-    <uses-sdk
-        android:minSdkVersion="24"
-        android:targetSdkVersion="25" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

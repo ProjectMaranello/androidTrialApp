@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.loopj.android.http.BlackholeHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +36,7 @@ import o.maranello.speedtest.SpeedtestResults;
 public class TestResults extends AppCompatActivity {
 
     //Common prefs file used throughout the project
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "TestResults";
 
     // UI references.
@@ -101,9 +100,8 @@ public class TestResults extends AppCompatActivity {
 
     /**
      * Handle the retry test click
-     * @param view the item clicked
      */
-    public void retry(View view) {
+    public void retry(@SuppressWarnings("UnusedParameters") View view) {
         Log.i(TAG,"Entry: retry");
         SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
 
@@ -255,7 +253,6 @@ public class TestResults extends AppCompatActivity {
          */
         protected Boolean doInBackground(Void... params) {
             Log.i(TAG,"Entry: doInBackground");
-            RequestParams requestParams = new RequestParams();
             JSONObject jsonParams = new JSONObject();
             try {
                 JSONObject record = new JSONObject();

@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.loopj.android.http.BlackholeHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +29,7 @@ import o.maranello.speedtest.SpeedtestResults;
  */
 public class MaranelloGcmListenerService extends GcmListenerService {
     //Common prefs file used throughout the project
-    public static final String PREFS_NAME = "MaranelloPrefsFile";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "MaranelloGcmListenerSev";
     //Used to block multiple tests from running at the same time
     private SubmitResultsTask mSubmitResultsTask = null;
@@ -64,6 +63,7 @@ public class MaranelloGcmListenerService extends GcmListenerService {
             //If the test is enabled run the test otherwise the user has indicated that it should be turned off
             if(sharedAppPreferences.getBoolean("testOn",false)){
                 if (sharedAppPreferences.getString("ssid", "").equalsIgnoreCase(currentSSID)) {
+                    Log.d(TAG, "Execute Test");
                     new RunTest().execute();
                 } else {
                     Log.d(TAG, "Wrong SSID");
@@ -93,6 +93,7 @@ public class MaranelloGcmListenerService extends GcmListenerService {
             Log.i(TAG,"Entry: doInBackground");
             Speedtest test = new Speedtest();
             SpeedtestResults results = test.runTest();
+            test.destroy();
             Log.i(TAG,"Exit: doInBackground");
             return results;
         }
@@ -160,7 +161,6 @@ public class MaranelloGcmListenerService extends GcmListenerService {
         protected Boolean doInBackground(Void... params) {
             Log.i(TAG,"Entry: doInBackground");
 
-            RequestParams requestParams = new RequestParams();
             JSONObject jsonParams = new JSONObject();
             try {
                 JSONObject record = new JSONObject();

@@ -38,11 +38,11 @@ import javax.xml.xpath.XPathFactory;
  */
 public class Speedtest {
     private static final String TAG = "Speedtest";
+    private final SpeedtestResults results;
     private HashMap<String,Object> config;
     private HashMap<Double,Map<String,String>> servers;
     private HashMap<String,Map<String,String>> closest;
     private Map<String,String> best;
-    private SpeedtestResults results;
     private Double lat;
     private Double lon;
 
@@ -51,17 +51,21 @@ public class Speedtest {
         results = new SpeedtestResults();
     }
 
+    public void destroy() {
+        this.config.clear();
+        this.servers.clear();
+        this.closest.clear();
+        this.best.clear();
+
+    }
     /**
      * Download the speedtest.net configuration and return only the data
      * we are interested in
      */
-    public void getConfig(){
+    private void getConfig() {
         Log.i(TAG, "Entry: getConfig");
         config = new HashMap<>();
-        StringBuilder configXML = new StringBuilder();
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Accept-Encoding", "gzip");
-        HttpURLConnection connection = SpeedTestUtils.buildRequest("http://www.speedtest.net/speedtest-config.php",headers,null);
+        HttpURLConnection connection = SpeedTestUtils.buildRequest("http://www.speedtest.net/speedtest-config.php", null);
         connection = SpeedTestUtils.catchRequest(connection, null);
         InputStream response = SpeedTestUtils.getResponseStream(connection);
         BufferedReader reader = new BufferedReader(new InputStreamReader(response));
@@ -149,9 +153,7 @@ public class Speedtest {
                 "http://www.speedtest.net/speedtest-servers.php",
                 "http://c.speedtest.net/speedtest-servers.php"};
         for (String url : urls) {
-            HashMap<String, String> headers = new HashMap<>();
-            headers.put("Accept-Encoding", "gzip");
-            HttpURLConnection connection =  SpeedTestUtils.buildRequest(url + "?threads=" + config.get("threadsDownload"), headers, null);
+            HttpURLConnection connection = SpeedTestUtils.buildRequest(url + "?threads=" + config.get("threadsDownload"), null);
             connection = SpeedTestUtils.catchRequest(connection, null);
             InputStream response = SpeedTestUtils.getResponseStream(connection);
             BufferedReader reader = new BufferedReader(new InputStreamReader(response));
@@ -181,6 +183,7 @@ public class Speedtest {
                     Double destLon = Double.valueOf(server.getAttributes().getNamedItem("lon").getNodeValue());
                     Double d = SpeedTestUtils.distance(lat, lon, destLat,destLon);
 
+                    //noinspection SuspiciousMethodCalls
                     if(!ignore_servers.contains(serverId) && !servers.containsValue(serverId)){
                         HashMap<String, String> target = new HashMap<>();
                         target.put("name",server.getAttributes().getNamedItem("name").getNodeValue());
@@ -203,10 +206,6 @@ public class Speedtest {
 
     }
 
-    public void setMiniServer(){
-
-    }
-
     /**
      * Limit servers to the closest speedtest.net servers based on
      * geographic distance
@@ -223,7 +222,7 @@ public class Speedtest {
 
         for(int i = 0; i < 5; i++){
             distances.get(i);
-            Map<String,String> candidate = servers.get(distances.get(i));
+            @SuppressWarnings("SuspiciousMethodCalls") Map<String, String> candidate = servers.get(distances.get(i));
             closest.put(candidate.get("id"),candidate);
         }
         Log.i(TAG, "Exit: getClosestServers");
@@ -240,14 +239,12 @@ public class Speedtest {
         }
         Long bestLatency = null;
         for(Map.Entry<String,Map<String,String>> entry : closest.entrySet()) {
-            StringBuilder pingUrl = new StringBuilder();
+            String pingUrl = "";
 
-            pingUrl.append(FilenameUtils.getPath(entry.getValue().get("url")));
-            pingUrl.append("latency.txt");
-            HashMap<String, String> headers = new HashMap<>();
-            headers.put("Accept-Encoding", "gzip");
+            pingUrl += FilenameUtils.getPath(entry.getValue().get("url"));
+            pingUrl += "latency.txt";
             Long start = System.currentTimeMillis();
-            HttpURLConnection connection = SpeedTestUtils.buildRequest(pingUrl.toString(), headers, null);
+            HttpURLConnection connection = SpeedTestUtils.buildRequest(pingUrl, null);
             DataOutputStream output;
             //InputStream input = null;
             try {
@@ -286,26 +283,25 @@ public class Speedtest {
         for(int i = 0; i < ((Integer[])config.get("sizesDownload")).length; i ++){
             for(int r = 0; r < ((Integer)config.get("countsDownload")); r ++){
                 String size = String.valueOf(((Integer[])config.get("sizesDownload"))[i]);
-                StringBuilder downloadUrl = new StringBuilder();
-                downloadUrl.append(FilenameUtils.getPath(best.get("url")));
-                downloadUrl.append("random");
-                downloadUrl.append(size);
-                downloadUrl.append("x");
-                downloadUrl.append(size);
-                downloadUrl.append(".jpg");
-                urls.add(downloadUrl.toString());
+                String downloadUrl = "";
+                downloadUrl += FilenameUtils.getPath(best.get("url"));
+                downloadUrl += "random";
+                downloadUrl += size;
+                downloadUrl += "x";
+                downloadUrl += size;
+                downloadUrl += ".jpg";
+                urls.add(downloadUrl);
             }
         }
-        HashMap<String, String> headers = new HashMap<>();
         ArrayList<HttpURLConnection> requests = new ArrayList<>();
         ArrayList<Long> finished = new ArrayList<>();
         Integer requestCount = urls.size();
         for(String url : urls){
-            requests.add(SpeedTestUtils.buildRequest(url, headers, null));
+            requests.add(SpeedTestUtils.buildRequest(url, null));
         }
         BlockingQueue<Map<HTTPDownloader,Thread>> queue = new ArrayBlockingQueue<>((Integer)config.get("threadsDownload"));
         Long start = System.currentTimeMillis();
-        DownloadProducer producer = new DownloadProducer(queue, requests, requestCount, start, Long.valueOf((Integer)config.get("lengthDownload")));
+        DownloadProducer producer = new DownloadProducer(queue, requests);
         DownloadConsumer consumer = new DownloadConsumer(queue, requestCount, finished);
         //starting producer to produce messages in queue
         Thread prodThread = new Thread(producer);
@@ -324,7 +320,7 @@ public class Speedtest {
             e.printStackTrace();
         }
         Long stop = System.currentTimeMillis();
-        Long totalDownload = Long.valueOf(0);
+        Long totalDownload = 0L;
         for(Long result : finished){
             totalDownload += result;
         }
@@ -332,6 +328,7 @@ public class Speedtest {
         if(downloadResult > 100000){
             config.put("threadsUpload",8);
         }
+        //queue.remove();
         results.setBytesReceived(totalDownload);
         results.setDownloadSpeed(downloadResult);
     }
@@ -346,7 +343,6 @@ public class Speedtest {
         Integer requestCount = (Integer)config.get("uploadMax");
         HashMap<HttpURLConnection, HTTPUploaderData> requests = new HashMap<>();
         ArrayList<Long> finished = new ArrayList<>();
-        HashMap<String, String> headers = new HashMap<>();
         for(int i = 0; i < ((Integer[])config.get("sizesUpload")).length; i ++) {
             for (int r = 0; r < ((Integer) config.get("countsUpload")); r++) {
                 //System.out.println(((Integer[])config.get("sizesUpload"))[i]);
@@ -356,14 +352,14 @@ public class Speedtest {
         for(Integer size : sizes){
             // We set ``0`` for ``start`` and handle setting the actual
             // ``start`` in ``HTTPUploader`` to get better measurements
-            HTTPUploaderData data = new HTTPUploaderData(size, 0, (Integer)config.get("lengthUpload"));
+            HTTPUploaderData data = new HTTPUploaderData(size);
             data.createData();
-            requests.put(SpeedTestUtils.buildRequest(best.get("url"), headers, data.getData()),data);
+            requests.put(SpeedTestUtils.buildRequest(best.get("url"), data.getData()), data);
         }
 
         BlockingQueue<Map<HTTPUploader,Thread>> queue = new ArrayBlockingQueue<>((Integer)config.get("threadsUpload"));
         Long start = System.currentTimeMillis();
-        UploadProducer producer = new UploadProducer(queue, requests, requestCount, start, Long.valueOf((Integer)config.get("lengthUpload")));
+        UploadProducer producer = new UploadProducer(queue, requests, requestCount);
         UploadConsumer consumer = new UploadConsumer(queue, requestCount, finished);
         //starting producer to produce messages in queue
         Thread prodThread = new Thread(producer);
@@ -382,10 +378,14 @@ public class Speedtest {
             e.printStackTrace();
         }
         Long stop = System.currentTimeMillis();
-        Long totalUpload = Long.valueOf(0);
+        Long totalUpload = 0L;
         for(Long result : finished){
             totalUpload += result;
         }
+        for (HTTPUploaderData data : requests.values()) {
+            data.destroy();
+        }
+        requests.clear();
         Double uploadResult = (totalUpload / (stop - start)) * 8.0;
         results.setBytesSent(totalUpload);
         results.setUploadSpeed(uploadResult);

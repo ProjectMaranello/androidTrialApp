@@ -69,9 +69,8 @@ public class Welcome extends AppCompatActivity {
     /**
      * Navigate to next view
      *
-     * @param view the event
      */
-    public void register(View view) {
+    public void register(@SuppressWarnings("UnusedParameters") View view) {
         Log.i(TAG, "Entry: register");
         Intent intent = new Intent(this, Register.class);
         startActivity(intent);

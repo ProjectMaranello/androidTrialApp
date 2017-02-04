@@ -16,9 +16,9 @@ import java.util.zip.GZIPInputStream;
  * Created by kristianthornley on 30/11/16.
  * Utils for handling speedtest functions
  */
-public class SpeedTestUtils {
+class SpeedTestUtils {
 
-    public static HttpURLConnection buildRequest(String urlString, HashMap<String, String> data, String urlParameters){
+    public static HttpURLConnection buildRequest(String urlString, String urlParameters) {
         HttpURLConnection connection = null;
         try {
             URL url = new URL(urlString);
@@ -55,14 +55,24 @@ public class SpeedTestUtils {
     }
 
     public static HttpURLConnection catchRequest(HttpURLConnection connection, String urlParameters){
+        DataOutputStream output = null;
         try {
-            DataOutputStream output = new DataOutputStream (connection.getOutputStream());
+            output = new DataOutputStream(connection.getOutputStream());
             if(urlParameters != null) {
                 output.writeBytes(urlParameters);
             }
-            output.close();
+
         } catch (IOException e){
             e.printStackTrace();
+        } finally {
+            try {
+                if (output != null) {
+                    output.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         return connection;
     }
