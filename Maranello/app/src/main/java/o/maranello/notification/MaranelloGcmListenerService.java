@@ -8,7 +8,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.loopj.android.http.BlackholeHttpResponseHandler;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
+import o.maranello.clients.SlackClient;
 import o.maranello.runnable.RunTest;
 
 /**
@@ -45,14 +54,17 @@ public class MaranelloGcmListenerService extends GcmListenerService {
 
         if ("runtest".equalsIgnoreCase(message)) {
             SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME, 0);
+            String deviceId = sharedAppPreferences.getString("deviceId", "");
             if (test != null) {
                 Log.d(TAG, "Test is already running");
+                notifyTestProgress("Device " + deviceId + " received message but test is already running");
                 return;
             }
             //If the test is enabled run the test otherwise the user has indicated that it should be turned off
             if (sharedAppPreferences.getBoolean("testOn", false)) {
                 if (sharedAppPreferences.getString("ssid", "").equalsIgnoreCase(currentSSID)) {
                     Log.d(TAG, "Execute Test");
+                    notifyTestProgress("Device " + deviceId + " received message and is starting test");
                     test = new RunTest(getApplicationContext());
                     Thread worker = new Thread(test);
                     worker.start();
@@ -64,11 +76,14 @@ public class MaranelloGcmListenerService extends GcmListenerService {
                         }
                     }
                     test = null;
+                    notifyTestProgress("Device " + deviceId + " received message completed test");
                     Log.d(TAG, "Complete");
                 } else {
+                    notifyTestProgress("Device " + deviceId + " received message but is on the different Wifi");
                     Log.d(TAG, "Wrong SSID");
                 }
             } else {
+                notifyTestProgress("Device " + deviceId + " received message testing is disabled");
                 Log.d(TAG, "Test disabled");
             }
 
@@ -77,5 +92,36 @@ public class MaranelloGcmListenerService extends GcmListenerService {
             Log.d(TAG, "Message was not runtest");
         }
         Log.i(TAG, "Exit: onMessageReceived");
+    }
+
+    private void notifyTestProgress(String state) {
+        try {
+            JSONObject record = new JSONObject();
+            record.put("text", state);
+            StringEntity entity = new StringEntity(record.toString());
+            Log.d(TAG, "Submitting Results: " + record.toString());
+            SlackClient.post(this.getApplicationContext(), entity, new BlackholeHttpResponseHandler() {
+                private static final String TAG = "BlackholeHttpResponse";
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    if (statusCode == 200) {
+                        Log.d(TAG, "Successfully Submitted Results");
+                    } else {
+                        Log.e(TAG, "Exception in Reporting Results");
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable exception) {
+                    Log.e(TAG, "Exception in Reporting Results " + statusCode);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 }
