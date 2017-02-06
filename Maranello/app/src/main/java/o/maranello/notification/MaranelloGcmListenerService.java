@@ -18,7 +18,8 @@ import java.io.UnsupportedEncodingException;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.clients.SlackClient;
-import o.maranello.runnable.RunTest;
+import o.maranello.runnable.TestInProgressException;
+import o.maranello.runnable.TestManager;
 
 /**
  * Created by kristianthornley on 27/11/16.
@@ -30,7 +31,6 @@ public class MaranelloGcmListenerService extends GcmListenerService {
     private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "MaranelloGcmListenerSev";
     //Used to block multiple tests from running at the same time
-    private RunTest test = null;
 
 
     /**
@@ -55,28 +55,18 @@ public class MaranelloGcmListenerService extends GcmListenerService {
         if ("runtest".equalsIgnoreCase(message)) {
             SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME, 0);
             String deviceId = sharedAppPreferences.getString("deviceId", "");
-            if (test != null) {
-                Log.d(TAG, "Test is already running");
-                notifyTestProgress("Device " + deviceId + " received message but test is already running");
-                return;
-            }
+
             //If the test is enabled run the test otherwise the user has indicated that it should be turned off
             if (sharedAppPreferences.getBoolean("testOn", false)) {
                 if (sharedAppPreferences.getString("ssid", "").equalsIgnoreCase(currentSSID)) {
                     Log.d(TAG, "Execute Test");
-                    notifyTestProgress("Device " + deviceId + " received message and is starting test");
-                    test = new RunTest(getApplicationContext());
-                    Thread worker = new Thread(test);
-                    worker.start();
-                    while (worker.isAlive()) {
-                        try {
-                            worker.join(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    try {
+                        TestManager.getInstance().startTest(getApplicationContext(), deviceId);
+                    } catch (TestInProgressException e) {
+                        Log.d(TAG, "Test is already running");
+                        notifyTestProgress("Device " + deviceId + " received message but test is already running");
+                        return;
                     }
-                    test = null;
-                    notifyTestProgress("Device " + deviceId + " received message completed test");
                     Log.d(TAG, "Complete");
                 } else {
                     notifyTestProgress("Device " + deviceId + " received message but is on the different Wifi");
