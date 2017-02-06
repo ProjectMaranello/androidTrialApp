@@ -5,15 +5,25 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.loopj.android.http.BlackholeHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.R;
+import o.maranello.clients.SlackClient;
+import o.maranello.clients.WatsonClient;
 
 /**
  * Created by kristianthornley on 27/11/16.
@@ -50,8 +60,47 @@ public class RegistrationIntentService extends IntentService {
             Log.i(TAG, "GCM Registration Token: " + token);
             //Persist the token to the shared app context
             SharedPreferences.Editor editor = sharedAppPreferences.edit();
-            editor.putString("gsmToken", token);
-            editor.apply();
+            //If Token is not the same as saved token and the saved token is not empty
+            if (!sharedAppPreferences.getString("gsmToken", "").equals(token) && !TextUtils.isEmpty(sharedAppPreferences.getString("gsmToken", ""))) {
+                //Token Has Changed
+                String deviceId = sharedAppPreferences.getString("deviceId", "");
+                notifyTokenChanged("Device " + deviceId + " has changed GSM key notifing Watson");
+                JSONObject jsonParams = new JSONObject();
+                try {
+                    JSONObject record = new JSONObject();
+                    record.put("messageType", "token_refresh");
+                    record.put("device", sharedAppPreferences.getString("deviceId", ""));
+                    record.put("iotKey", token);
+                    jsonParams.put("d", record);
+                    jsonParams.put("ts", 0);
+                    jsonParams.put("serviceRequestor", "Server");
+                    StringEntity entity = new StringEntity(jsonParams.toString());
+                    Log.d(TAG, "Submitting Token Update: " + jsonParams.toString());
+                    WatsonClient.post(sharedAppPreferences.getString("deviceId", "") + "/events/event", this.getApplicationContext(), entity, sharedAppPreferences.getString("iotKey", ""), new BlackholeHttpResponseHandler() {
+                        private static final String TAG = "BlackholeHttpResponse";
+
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                            if (statusCode == 200) {
+                                Log.d(TAG, "Successfully Token Update");
+                            } else {
+                                Log.e(TAG, "Exception in Token Update");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable exception) {
+                            Log.e(TAG, "Exception in Token Update " + statusCode);
+                        }
+                    });
+                } catch (JSONException e) {
+                    Log.e(TAG, "Exception in JSON");
+                } catch (UnsupportedEncodingException e2) {
+                    Log.e(TAG, "Exception in Encoding");
+                }
+
+            }
+            editor.putString("gsmToken", token).apply();
             sendRegistrationToServer();
 
             // Subscribe to topic channels
@@ -100,5 +149,36 @@ public class RegistrationIntentService extends IntentService {
             pubSub.subscribe(token, "/topics/" + topic, null);
         }
         Log.i(TAG,"Exit: subscribeTopics");
+    }
+
+    private void notifyTokenChanged(String state) {
+        try {
+            JSONObject record = new JSONObject();
+            record.put("text", state);
+            StringEntity entity = new StringEntity(record.toString());
+            Log.d(TAG, "Submitting Status: " + record.toString());
+            SlackClient.post(this.getApplicationContext(), entity, new BlackholeHttpResponseHandler() {
+                private static final String TAG = "BlackholeHttpResponse";
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    if (statusCode == 200) {
+                        Log.d(TAG, "Successfully Submitted Status");
+                    } else {
+                        Log.e(TAG, "Exception in Reporting Status");
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable exception) {
+                    Log.e(TAG, "Exception in Reporting Status " + statusCode);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

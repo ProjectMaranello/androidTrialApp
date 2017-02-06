@@ -36,8 +36,12 @@ class HTTPUploader implements Runnable {
             e.printStackTrace();
         } finally {
             try {
-                buffer.close();
-                input.close();
+                if (buffer != null) {
+                    buffer.close();
+                }
+                if (input != null) {
+                    input.close();
+                }
                 if (this.request != null) {
                     this.request.disconnect();
                 }
