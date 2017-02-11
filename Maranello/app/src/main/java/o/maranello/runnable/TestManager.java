@@ -20,6 +20,7 @@ import o.maranello.clients.SlackClient;
 public class TestManager {
     private static final String TAG = "TestManager";
     private static TestManager ourInstance = new TestManager();
+    private boolean isComplete = false;
     private RunTest currentTest = null;
     private Context context;
 
@@ -32,6 +33,7 @@ public class TestManager {
 
     public void startTest(Context context, String deviceId) throws TestInProgressException {
         if (currentTest == null) {
+            isComplete = false;
             notifyTestProgress("Device " + deviceId + " received message and is starting test");
             this.context = context;
             currentTest = new RunTest(context);
@@ -44,6 +46,7 @@ public class TestManager {
                     e.printStackTrace();
                 }
             }
+            isComplete = true;
             notifyTestProgress("Device " + deviceId + " received message completed test");
             currentTest = null;
         } else {
@@ -52,6 +55,9 @@ public class TestManager {
 
     }
 
+    public boolean isComplete() {
+        return isComplete;
+    }
     private void notifyTestProgress(String state) {
         try {
             JSONObject record = new JSONObject();
