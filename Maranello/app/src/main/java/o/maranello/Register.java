@@ -142,7 +142,7 @@ public class Register extends AppCompatActivity {
             showProgress(true);
             //Get Token
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-            mAuthTask = new UserLoginTask(email, password, settings.getString("gsmToken",""));
+            mAuthTask = new UserLoginTask(email.trim(), password.trim(), settings.getString("gsmToken", ""));
             mAuthTask.execute((Void) null);
         }
     }

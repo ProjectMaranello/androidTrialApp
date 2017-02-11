@@ -37,7 +37,7 @@
     <string name="register.heading">Register</string>
     <string name="prompt_email">User</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
