@@ -281,14 +281,16 @@ public class Speedtest {
 
             pingUrl += FilenameUtils.getPath(entry.getValue().get("url"));
             pingUrl += "latency.txt";
-            Long start = System.currentTimeMillis();
             Long[] samples = new Long[3];
             for (Integer i = 0; i < 3; i++) {
+                Long start = System.currentTimeMillis();
                 HttpURLConnection connection = SpeedTestUtils.buildRequest(pingUrl, null);
                 DataOutputStream output;
                 try {
                     output = new DataOutputStream(connection.getOutputStream());
                     InputStream response = SpeedTestUtils.getResponseStream(connection);
+                    Long end = System.currentTimeMillis();
+
                     BufferedInputStream buffer = new BufferedInputStream(response);
                     Scanner s = new Scanner(buffer).useDelimiter("\\A");
                     String result = s.hasNext() ? s.next() : "";
@@ -297,12 +299,14 @@ public class Speedtest {
                         buffer.close();
                     }
                     output.close();
-                    Long end = System.currentTimeMillis();
                     Long latency = end - start;
-                    samples[i] = latency;
-
+                    if ("test=test".equalsIgnoreCase(result.trim())) {
+                        samples[i] = latency;
+                    } else {
+                        samples[i] = Long.valueOf(3600);
+                    }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    samples[i] = Long.valueOf(3600);
                 } finally {
                     connection.disconnect();
                 }
