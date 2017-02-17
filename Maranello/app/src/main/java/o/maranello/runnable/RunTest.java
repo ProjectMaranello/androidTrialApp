@@ -36,10 +36,10 @@ public class RunTest implements Runnable {
     @Override
     public void run() {
         Log.i(TAG, "Entry: run");
-        Speedtest test = new Speedtest();
+        SharedPreferences settings = this.context.getSharedPreferences(PREFS_NAME, 0);
+        Speedtest test = new Speedtest(settings.getString("deviceId", ""), context);
         SpeedtestResults result = test.runTest();
         test.destroy();
-        SharedPreferences settings = this.context.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("ping", String.valueOf(result.getPing()));
         editor.putString("uploadSpeed", String.valueOf(result.getUploadSpeed()));

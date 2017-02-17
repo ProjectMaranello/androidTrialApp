@@ -1,26 +1,36 @@
 package o.maranello.speedtest;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.loopj.android.http.BlackholeHttpResponseHandler;
+
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -32,6 +42,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
+import o.maranello.clients.SlackClient;
+
 /**
  * Created by kristianthornley on 28/11/16.
  * Speedtest port of python speedtest-cli
@@ -40,13 +54,17 @@ public class Speedtest {
     private static final String TAG = "Speedtest";
     private final SpeedtestResults results;
     private HashMap<String,Object> config;
-    private HashMap<Double,Map<String,String>> servers;
+    private HashMap<String, Map<String, String>> servers;
     private HashMap<String,Map<String,String>> closest;
     private Map<String,String> best;
     private Double lat;
     private Double lon;
+    private Context context;
+    private String device;
 
-    public Speedtest(){
+    public Speedtest(String device, Context context) {
+        this.device = device;
+        this.context = context;
         getConfig();
         results = new SpeedtestResults();
     }
@@ -146,7 +164,7 @@ public class Speedtest {
      * Retrieve a the list of speedtest.net servers, optionally filtered
      * to servers matching those specified in the ``servers`` argument
      */
-    public void getServers(){
+    public void getServers() throws SpeedTestException {
         Log.i(TAG, "Entry: getServers");
         String[] urls = {"http://www.speedtest.net/speedtest-servers-static.php",
                 "http://c.speedtest.net/speedtest-servers-static.php",
@@ -156,6 +174,9 @@ public class Speedtest {
             HttpURLConnection connection = SpeedTestUtils.buildRequest(url + "?threads=" + config.get("threadsDownload"), null);
             connection = SpeedTestUtils.catchRequest(connection, null);
             InputStream response = SpeedTestUtils.getResponseStream(connection);
+            if (response == null) {
+                throw new SpeedTestException("GET_SERVERS", "Get Servers Response Was Null");
+            }
             BufferedReader reader = new BufferedReader(new InputStreamReader(response));
             String line;
             StringBuilder buffer = new StringBuilder();
@@ -173,7 +194,7 @@ public class Speedtest {
                 DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = builderFactory.newDocumentBuilder();
                 Document document = builder.parse(new InputSource(new StringReader(buffer.toString())));
-               // System.out.println(buffer.toString());
+                //System.out.println(buffer.toString());
                 XPath path =  XPathFactory.newInstance().newXPath();
                 NodeList possibleServers  = (NodeList) path.compile("/settings/servers/server").evaluate(document, XPathConstants.NODESET);
                 for(int r = 0 ; r < possibleServers.getLength(); r++){
@@ -189,7 +210,9 @@ public class Speedtest {
                         target.put("name",server.getAttributes().getNamedItem("name").getNodeValue());
                         target.put("url",server.getAttributes().getNamedItem("url").getNodeValue());
                         target.put("id",serverId);
-                        servers.put(d,target);
+                        target.put("distance", d.toString());
+                        //Log.i(this.TAG, "Server: " + target.get("name") + " is " + d);
+                        servers.put(target.get("url"), target);
                     }
                 }
             } catch (IOException e){
@@ -200,6 +223,8 @@ public class Speedtest {
                 Log.e(TAG, "SAXException");
             } catch (XPathExpressionException e) {
                 Log.e(TAG, "XPathExpressionException");
+            } finally {
+                connection.disconnect();
             }
         }
         Log.i(TAG, "Exit: getServers");
@@ -210,21 +235,34 @@ public class Speedtest {
      * Limit servers to the closest speedtest.net servers based on
      * geographic distance
      */
-    public void getClosestServers(){
+    public void getClosestServers() throws SpeedTestException {
         Log.i(TAG, "Entry: getClosestServers");
         if (servers == null){
             getServers();
-        }
-        Object[] sorted = servers.keySet().toArray();
-        Arrays.sort(sorted);
-        List<Object> distances = Arrays.asList(sorted);
-        closest = new HashMap<>();
 
-        for(int i = 0; i < 5; i++){
-            distances.get(i);
-            @SuppressWarnings("SuspiciousMethodCalls") Map<String, String> candidate = servers.get(distances.get(i));
+        }
+        List<Map<String, String>> sorted = new ArrayList<Map<String, String>>(servers.values());
+
+        Comparator<Map<String, String>> comparator = new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> left, Map<String, String> right) {
+                if (Double.valueOf(left.get("distance")) > Double.valueOf(right.get("distance"))) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+        Collections.sort(sorted, comparator); // use the comparator as much as u wan
+        closest = new HashMap<String, Map<String, String>>();
+
+        for (int i = 0; i < 4; i++) {
+            sorted.get(i);
+            Map<String, String> candidate = sorted.get(i);
+            System.out.println(candidate.get("name"));
             closest.put(candidate.get("id"),candidate);
         }
+        //notifyTestProgress("Device " + this.device + " closest servers are " + closest.toString());
         Log.i(TAG, "Exit: getClosestServers");
     }
 
@@ -232,7 +270,7 @@ public class Speedtest {
      * Perform a speedtest.net "ping" to determine which speedtest.net
      * server has the lowest latency
      */
-    public void getBestServer(){
+    public void getBestServer() throws SpeedTestException {
         Log.i(TAG, "Entry: getBestServer");
         if (closest == null){
             getClosestServers();
@@ -244,22 +282,38 @@ public class Speedtest {
             pingUrl += FilenameUtils.getPath(entry.getValue().get("url"));
             pingUrl += "latency.txt";
             Long start = System.currentTimeMillis();
-            HttpURLConnection connection = SpeedTestUtils.buildRequest(pingUrl, null);
-            DataOutputStream output;
-            //InputStream input = null;
-            try {
-                output = new DataOutputStream(connection.getOutputStream());
-                output.close();
-                //if("gzip".equalsIgnoreCase(connection.getHeaderField("Content-Encoding"))) {
-                //input = new GZIPInputStream(connection.getInputStream());
-                //}else {
-                //input = connection.getInputStream();
-                //}
-            } catch (IOException e) {
-                e.printStackTrace();
+            Long[] samples = new Long[3];
+            for (Integer i = 0; i < 3; i++) {
+                HttpURLConnection connection = SpeedTestUtils.buildRequest(pingUrl, null);
+                DataOutputStream output;
+                try {
+                    output = new DataOutputStream(connection.getOutputStream());
+                    InputStream response = SpeedTestUtils.getResponseStream(connection);
+                    BufferedInputStream buffer = new BufferedInputStream(response);
+                    Scanner s = new Scanner(buffer).useDelimiter("\\A");
+                    String result = s.hasNext() ? s.next() : "";
+                    Log.i(TAG, "Ping text " + result);
+                    if (buffer != null) {
+                        buffer.close();
+                    }
+                    output.close();
+                    Long end = System.currentTimeMillis();
+                    Long latency = end - start;
+                    samples[i] = latency;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
             }
-            Long end = System.currentTimeMillis();
-            Long latency = end - start;
+            int sum = 0;
+            for (Long l : samples) {
+                sum += l;
+            }
+            Double average = 1.0d * sum / samples.length;
+            Long latency = average.longValue();
+            notifyTestProgress("Device " + this.device + " candidate server : " + entry.getValue().get("url") + " latency is " + latency);
             if (bestLatency == null || bestLatency > latency) {
                 bestLatency = latency;
                 best = entry.getValue();
@@ -267,18 +321,18 @@ public class Speedtest {
             }
         }
         results.setServer(best);
+        notifyTestProgress("Device " + this.device + " selected best server for test as: " + best.get("url"));
         Log.i(TAG, "Exit: getBestServer");
     }
 
     /**
      * Test download speed against speedtest.net
      */
-    public void download(){
+    public void download() throws SpeedTestException {
 
         if (best == null){
             getBestServer();
         }
-
         ArrayList<String> urls = new ArrayList<>();
         for(int i = 0; i < ((Integer[])config.get("sizesDownload")).length; i ++){
             for(int r = 0; r < ((Integer)config.get("countsDownload")); r ++){
@@ -335,7 +389,7 @@ public class Speedtest {
     /**
      * Test upload speed against speedtest.net
      */
-    public void upload(){
+    public void upload() throws SpeedTestException {
         if (best == null){
             getBestServer();
         }
@@ -397,9 +451,43 @@ public class Speedtest {
      * @return Speedtest results
      */
     public SpeedtestResults runTest(){
-        this.download();
-        this.upload();
+        try {
+            this.download();
+            this.upload();
+        } catch (SpeedTestException e) {
+
+        }
         return this.results;
     }
 
+    private void notifyTestProgress(String state) {
+        try {
+            JSONObject record = new JSONObject();
+            record.put("text", state);
+            StringEntity entity = new StringEntity(record.toString());
+            Log.d(TAG, "Submitting Results: " + record.toString());
+            SlackClient.post(this.context, entity, new BlackholeHttpResponseHandler() {
+                private static final String TAG = "BlackholeHttpResponse";
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    if (statusCode == 200) {
+                        Log.d(TAG, "Successfully Submitted Results");
+                    } else {
+                        Log.e(TAG, "Exception in Reporting Results");
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable exception) {
+                    Log.e(TAG, "Exception in Reporting Results " + statusCode);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

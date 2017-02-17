@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
@@ -69,7 +70,11 @@ public class MaranelloGcmListenerService extends GcmListenerService {
                     }
                     Log.d(TAG, "Complete");
                 } else {
-                    notifyTestProgress("Device " + deviceId + " received message but is on the different Wifi");
+                    if (!TextUtils.isEmpty(currentSSID)) {
+                        notifyTestProgress("Device " + deviceId + " received message but is on not on Wifi ");
+                    } else {
+                        notifyTestProgress("Device " + deviceId + " received message but is on the different Wifi. Current Wifi: " + currentSSID + " Saved Wifi: " + sharedAppPreferences.getString("ssid", ""));
+                    }
                     Log.d(TAG, "Wrong SSID");
                 }
             } else {
