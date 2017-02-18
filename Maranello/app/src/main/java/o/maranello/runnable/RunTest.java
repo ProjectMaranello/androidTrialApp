@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.clients.WatsonClient;
+import o.maranello.speedtest.SpeedTestException;
 import o.maranello.speedtest.Speedtest;
 import o.maranello.speedtest.SpeedtestResults;
 
@@ -38,16 +39,18 @@ public class RunTest implements Runnable {
         Log.i(TAG, "Entry: run");
         SharedPreferences settings = this.context.getSharedPreferences(PREFS_NAME, 0);
         Speedtest test = new Speedtest(settings.getString("deviceId", ""), context);
-        SpeedtestResults result = test.runTest();
-        test.destroy();
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("ping", String.valueOf(result.getPing()));
-        editor.putString("uploadSpeed", String.valueOf(result.getUploadSpeed()));
-        editor.putString("downloadSpeed", String.valueOf(result.getDownloadSpeed()));
-        editor.apply();
-        System.gc();
-        JSONObject jsonParams = new JSONObject();
         try {
+            SpeedtestResults result = test.runTest();
+
+            test.destroy();
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("ping", String.valueOf(result.getPing()));
+            editor.putString("uploadSpeed", String.valueOf(result.getUploadSpeed()));
+            editor.putString("downloadSpeed", String.valueOf(result.getDownloadSpeed()));
+            editor.apply();
+            System.gc();
+            JSONObject jsonParams = new JSONObject();
+
             JSONObject record = new JSONObject();
             record.put("messageType", "measurement");
             record.put("device", settings.getString("deviceId", ""));
@@ -80,6 +83,8 @@ public class RunTest implements Runnable {
             Log.e(TAG, "Exception in JSON");
         } catch (UnsupportedEncodingException e2) {
             Log.e(TAG, "Exception in Encoding");
+        } catch (SpeedTestException e) {
+            Log.e(TAG, "Exception in Testing");
         }
 
         Log.i(TAG, "Exit: run");

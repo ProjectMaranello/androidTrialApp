@@ -65,22 +65,30 @@ public class Speedtest {
     public Speedtest(String device, Context context) {
         this.device = device;
         this.context = context;
-        getConfig();
         results = new SpeedtestResults();
     }
 
     public void destroy() {
-        this.config.clear();
-        this.servers.clear();
-        this.closest.clear();
-        this.best.clear();
-
+        if (this.config != null) {
+            this.config.clear();
+        }
+        if (this.servers != null) {
+            this.servers.clear();
+        }
+        if (this.closest != null) {
+            this.closest.clear();
+        }
+        if (this.best != null) {
+            this.best.clear();
+        }
+        this.context = null;
+        this.device = null;
     }
     /**
      * Download the speedtest.net configuration and return only the data
      * we are interested in
      */
-    private void getConfig() {
+    private void getConfig() throws SpeedTestException {
         Log.i(TAG, "Entry: getConfig");
         config = new HashMap<>();
         HttpURLConnection connection = SpeedTestUtils.buildRequest("http://www.speedtest.net/speedtest-config.php", null);
@@ -118,11 +126,6 @@ public class Speedtest {
             Integer[] sizesUpload = new Integer[up_sizes.length - ratio +1];
             System.arraycopy(up_sizes, ratio-1, sizesUpload, 0, up_sizes.length - ratio +1);
             Integer countsUpload = upload_max * 2 / sizesUpload.length;
-
-            /*System.out.println("Sizes Upload Length:" + sizesUpload.length);
-            System.out.println("Upload Max:" + upload_max);
-            System.out.println("Count Upload:" + countsUpload);
-            */
             Integer[] sizesDownload = {350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000};
             Integer countsDownload = Integer.valueOf(download.get("threadsperurl"));
             Integer threadsUpload = Integer.valueOf(upload.get("threads"));
@@ -150,12 +153,16 @@ public class Speedtest {
 
         } catch (IOException e){
             Log.e(TAG, "IOException");
+            throw new SpeedTestException("GET_CONFIG", "Get Config IOException");
         } catch (ParserConfigurationException e) {
             Log.e(TAG, "ParserConfigurationException");
+            throw new SpeedTestException("GET_CONFIG", "Get Config ParserConfigurationException");
         } catch (SAXException e) {
             Log.e(TAG, "SAXException");
+            throw new SpeedTestException("GET_CONFIG", "Get Config SAXException");
         } catch (XPathExpressionException e) {
             Log.e(TAG, "XPathExpressionException");
+            throw new SpeedTestException("GET_CONFIG", "Get Config XPathExpressionException");
         }
         Log.i(TAG, "Exit: getConfig");
     }
@@ -170,6 +177,9 @@ public class Speedtest {
                 "http://c.speedtest.net/speedtest-servers-static.php",
                 "http://www.speedtest.net/speedtest-servers.php",
                 "http://c.speedtest.net/speedtest-servers.php"};
+        if (servers == null) {
+            servers = new HashMap<>();
+        }
         for (String url : urls) {
             HttpURLConnection connection = SpeedTestUtils.buildRequest(url + "?threads=" + config.get("threadsDownload"), null);
             connection = SpeedTestUtils.catchRequest(connection, null);
@@ -180,12 +190,7 @@ public class Speedtest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(response));
             String line;
             StringBuilder buffer = new StringBuilder();
-            @SuppressWarnings("unchecked")
             List<String> ignore_servers = (List<String>) config.get("ignore_servers");
-
-            if(servers == null){
-                servers = new HashMap<>();
-            }
             try {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
@@ -217,12 +222,16 @@ public class Speedtest {
                 }
             } catch (IOException e){
                 Log.e(TAG, "IOException");
+                throw new SpeedTestException("GET_SERVERS", "Get Servers IOException");
             } catch (ParserConfigurationException e) {
                 Log.e(TAG, "ParserConfigurationException");
+                throw new SpeedTestException("GET_SERVERS", "Get Servers ParserConfigurationException");
             } catch (SAXException e) {
                 Log.e(TAG, "SAXException");
+                throw new SpeedTestException("GET_SERVERS", "Get Servers SAXException");
             } catch (XPathExpressionException e) {
                 Log.e(TAG, "XPathExpressionException");
+                throw new SpeedTestException("GET_SERVERS", "Get Servers XPathExpressionException");
             } finally {
                 connection.disconnect();
             }
@@ -238,11 +247,17 @@ public class Speedtest {
     public void getClosestServers() throws SpeedTestException {
         Log.i(TAG, "Entry: getClosestServers");
         if (servers == null){
-            getServers();
-
+            try {
+                getServers();
+                ConfigHelper.getInstance().setServers(servers);
+            } catch (SpeedTestException e) {
+                servers = ConfigHelper.getInstance().getServers();
+            }
         }
         List<Map<String, String>> sorted = new ArrayList<Map<String, String>>(servers.values());
-
+        if (sorted.size() == 0) {
+            throw new SpeedTestException("GET_CLOSEST_SERVERS", "No Servers to Rank");
+        }
         Comparator<Map<String, String>> comparator = new Comparator<Map<String, String>>() {
             @Override
             public int compare(Map<String, String> left, Map<String, String> right) {
@@ -257,12 +272,10 @@ public class Speedtest {
         closest = new HashMap<String, Map<String, String>>();
 
         for (int i = 0; i < 4; i++) {
-            sorted.get(i);
             Map<String, String> candidate = sorted.get(i);
             System.out.println(candidate.get("name"));
             closest.put(candidate.get("id"),candidate);
         }
-        //notifyTestProgress("Device " + this.device + " closest servers are " + closest.toString());
         Log.i(TAG, "Exit: getClosestServers");
     }
 
@@ -456,12 +469,22 @@ public class Speedtest {
      *
      * @return Speedtest results
      */
-    public SpeedtestResults runTest(){
+    public SpeedtestResults runTest() throws SpeedTestException {
         try {
-            this.download();
-            this.upload();
+            try {
+                getConfig();
+                ConfigHelper.getInstance().setConfig(config);
+            } catch (SpeedTestException e) {
+                config = ConfigHelper.getInstance().getConfig();
+            }
+            download();
+            upload();
         } catch (SpeedTestException e) {
-
+            notifyTestProgress("Device " + this.device + " encountered exception: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            notifyTestProgress("Device " + this.device + " encountered generic exception: " + e.getMessage());
+            throw new SpeedTestException("GENERIC", e.getMessage());
         }
         return this.results;
     }

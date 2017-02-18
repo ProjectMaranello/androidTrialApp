@@ -23,7 +23,7 @@ class SpeedTestUtils {
         try {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(1000);
+            //connection.setConnectTimeout(1000);
             System.setProperty("http.keepAlive", "false");
             connection.setRequestProperty("Connection", "close");
             connection.setRequestProperty("Accept-Encoding", "gzip");
