@@ -45,6 +45,7 @@ public class RunTest implements Runnable {
         editor.putString("uploadSpeed", String.valueOf(result.getUploadSpeed()));
         editor.putString("downloadSpeed", String.valueOf(result.getDownloadSpeed()));
         editor.apply();
+        System.gc();
         JSONObject jsonParams = new JSONObject();
         try {
             JSONObject record = new JSONObject();

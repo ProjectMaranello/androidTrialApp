@@ -288,8 +288,9 @@ public class Speedtest {
                 DataOutputStream output;
                 try {
                     output = new DataOutputStream(connection.getOutputStream());
-                    InputStream response = SpeedTestUtils.getResponseStream(connection);
                     Long end = System.currentTimeMillis();
+
+                    InputStream response = SpeedTestUtils.getResponseStream(connection);
 
                     BufferedInputStream buffer = new BufferedInputStream(response);
                     Scanner s = new Scanner(buffer).useDelimiter("\\A");
@@ -357,14 +358,15 @@ public class Speedtest {
         for(String url : urls){
             requests.add(SpeedTestUtils.buildRequest(url, null));
         }
+        Log.i(TAG, "Downloading using Threadcount " + config.get("threadsDownload"));
         BlockingQueue<Map<HTTPDownloader,Thread>> queue = new ArrayBlockingQueue<>((Integer)config.get("threadsDownload"));
-        Long start = System.currentTimeMillis();
         DownloadProducer producer = new DownloadProducer(queue, requests);
         DownloadConsumer consumer = new DownloadConsumer(queue, requestCount, finished);
         //starting producer to produce messages in queue
         Thread prodThread = new Thread(producer);
         //starting consumer to consume messages from queue
         Thread consThread = new Thread(consumer);
+        Long start = System.currentTimeMillis();
         prodThread.start();
         consThread.start();
         try {

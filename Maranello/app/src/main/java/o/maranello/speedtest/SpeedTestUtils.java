@@ -23,9 +23,9 @@ class SpeedTestUtils {
         try {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
-
-
-
+            connection.setConnectTimeout(1000);
+            System.setProperty("http.keepAlive", "false");
+            connection.setRequestProperty("Connection", "close");
             connection.setRequestProperty("Accept-Encoding", "gzip");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A");
@@ -80,6 +80,7 @@ class SpeedTestUtils {
     public static InputStream getResponseStream(HttpURLConnection connection){
         InputStream input = null;
         try {
+            connection.connect();
             if("gzip".equalsIgnoreCase(connection.getHeaderField("Content-Encoding"))) {
                 input = new GZIPInputStream(connection.getInputStream());
             }else {
