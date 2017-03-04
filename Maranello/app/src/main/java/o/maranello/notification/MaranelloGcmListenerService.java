@@ -46,7 +46,6 @@ public class MaranelloGcmListenerService extends FirebaseMessagingService {
         String message = messageBundle.getData().get("message");
         Log.d(TAG, "Message From: " + messageBundle.getFrom());
         Log.d(TAG, "Message Is: " + message);
-
         //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();

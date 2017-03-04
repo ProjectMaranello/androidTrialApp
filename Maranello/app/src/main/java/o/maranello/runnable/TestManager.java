@@ -19,6 +19,8 @@ import o.maranello.clients.SlackClient;
  */
 public class TestManager {
     private static final String TAG = "TestManager";
+    private static final String PREFS_NAME = "MaranelloPrefsFile";
+
     private static TestManager ourInstance = new TestManager();
     private boolean isComplete = false;
     private RunTest currentTest = null;
@@ -27,12 +29,13 @@ public class TestManager {
     private TestManager() {
     }
 
-    public static TestManager getInstance() {
+    public static synchronized TestManager getInstance() {
         return ourInstance;
     }
 
     public void startTest(Context context, String deviceId) throws TestInProgressException {
         if (currentTest == null) {
+
             isComplete = false;
             notifyTestProgress("Device " + deviceId + " received message and is starting test");
             this.context = context;
