@@ -15,11 +15,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <permission
-        android:name="o.maranello.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
 
-    <uses-permission android:name="o.maranello.permission.C2D_MESSAGE" />
 
     <!-- [END gcm_permission] -->
     <application
@@ -29,16 +25,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="o.maranello" />
-            </intent-filter>
-        </receiver>
         <receiver android:name=".heartbeat.PeriodicTaskReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_LOW" />
@@ -55,25 +41,19 @@
 
         <service android:name=".heartbeat.BackgroundService" />
 
-        <service
-            android:name=".notification.MaranelloGcmListenerService"
-            android:exported="false" >
+        <service android:name=".notification.MaranelloGcmListenerService">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="o.maranello" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service
             android:name=".notification.MaranelloInstanceIDListenerService"
             android:exported="false" >
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".notification.RegistrationIntentService"
-            android:exported="false" >
-        </service>
+
 
         <activity
             android:name=".Welcome"

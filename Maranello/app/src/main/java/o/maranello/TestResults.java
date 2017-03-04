@@ -96,7 +96,7 @@ public class TestResults extends AppCompatActivity {
         Log.i(TAG,"Entry: retry");
         SharedPreferences sharedAppPreferences = this.getSharedPreferences(PREFS_NAME,0);
         //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
         String currentSSID = info.getSSID();
         showProgress(true);

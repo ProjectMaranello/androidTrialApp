@@ -29,7 +29,7 @@ public class WifiSettings extends AppCompatActivity {
         Log.i(TAG, "Entry: onCreate");
         super.onCreate(savedInstanceState);
 
-        WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
         ssid = info.getSSID();
         Log.d(TAG, "SSID=" + ssid);

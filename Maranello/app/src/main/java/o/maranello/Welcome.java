@@ -18,7 +18,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import o.maranello.notification.MarenelloPreferences;
-import o.maranello.notification.RegistrationIntentService;
 
 public class Welcome extends AppCompatActivity {
     private static final String TAG = "Welcome";
@@ -58,11 +57,11 @@ public class Welcome extends AppCompatActivity {
         // Registering BroadcastReceiver
         registerReceiver();
 
-        if (checkPlayServices()) {
+        /*if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
-        }
+        }*/
         Log.i(TAG, "Exit: onCreate");
     }
 

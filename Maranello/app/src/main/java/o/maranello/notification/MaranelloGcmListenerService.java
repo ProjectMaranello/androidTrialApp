@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 import com.loopj.android.http.BlackholeHttpResponseHandler;
 
 import org.json.JSONException;
@@ -27,7 +27,7 @@ import o.maranello.runnable.TestManager;
  * Listens to the Google Cloud Messaging Notifications
  *
  */
-public class MaranelloGcmListenerService extends GcmListenerService {
+public class MaranelloGcmListenerService extends FirebaseMessagingService {
     //Common prefs file used throughout the project
     private static final String PREFS_NAME = "MaranelloPrefsFile";
     private static final String TAG = "MaranelloGcmListenerSev";
@@ -37,19 +37,18 @@ public class MaranelloGcmListenerService extends GcmListenerService {
     /**
      * Called when message is received.
      *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
+     * @param messageBundle SenderID of the sender.
+     *
      */
     @Override
-    public void onMessageReceived(String from, Bundle data) {
+    public void onMessageReceived(RemoteMessage messageBundle) {
         Log.i(TAG, "Entry: onMessageReceived");
-        String message = data.getString("message");
-        Log.d(TAG, "Message From: " + from);
+        String message = messageBundle.getData().get("message");
+        Log.d(TAG, "Message From: " + messageBundle.getFrom());
         Log.d(TAG, "Message Is: " + message);
 
         //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
         String currentSSID = info.getSSID();
 
