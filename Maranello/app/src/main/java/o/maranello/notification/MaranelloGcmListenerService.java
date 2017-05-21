@@ -11,6 +11,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.loopj.android.http.BlackholeHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 import o.maranello.clients.SlackClient;
 import o.maranello.runnable.TestInProgressException;
 import o.maranello.runnable.TestManager;
+import o.maranello.speedtest.Config;
 
 /**
  * Created by kristianthornley on 27/11/16.
@@ -44,6 +46,39 @@ public class MaranelloGcmListenerService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage messageBundle) {
         Log.i(TAG, "Entry: onMessageReceived");
         String message = messageBundle.getData().get("message");
+        String params = messageBundle.getData().get("params");
+        if(params != null){
+            try {
+                JSONObject paramsObj = new JSONObject(params);
+                Config config = Config.getInstance();
+                config.setThreadsDownload((Integer)paramsObj.get("threadsDownload"));
+                config.setIterationsDownload((Integer)paramsObj.get("iterationsDownload"));
+                JSONArray sizesDownload = (JSONArray)paramsObj.get("sizesDownload");
+                if (sizesDownload != null) {
+                    Integer[] sizesDownloadInts = new Integer[sizesDownload.length()];
+                    for (int i = 0; i < sizesDownload.length(); ++i) {
+                        sizesDownloadInts[i] = sizesDownload.optInt(i);
+                    }
+                    config.setSizesDownload(sizesDownloadInts);
+                }
+
+
+                config.setThreadsUpload((Integer)paramsObj.get("threadsUpload"));
+                config.setIterationsUpload((Integer)paramsObj.get("iterationsUpload"));
+
+                JSONArray sizesUpload = (JSONArray)paramsObj.get("sizesUpload");
+                if (sizesUpload != null) {
+                    Integer[] sizesUploadInts = new Integer[sizesUpload.length()];
+                    for (int i = 0; i < sizesUpload.length(); ++i) {
+                        sizesUploadInts[i] = sizesUpload.optInt(i);
+                    }
+                    config.setSizesUpload(sizesUploadInts);
+                }
+
+            } catch (JSONException e ){
+                e.printStackTrace();
+            }
+        }
         Log.d(TAG, "Message From: " + messageBundle.getFrom());
         Log.d(TAG, "Message Is: " + message);
         //Get the current SSID and check againts the SSID stored e.g. they could be at a friends house

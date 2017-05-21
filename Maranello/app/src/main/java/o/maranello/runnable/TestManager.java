@@ -50,7 +50,7 @@ public class TestManager {
                 }
             }
             isComplete = true;
-            notifyTestProgress("Device " + deviceId + " received message completed test");
+            //notifyTestProgress("Device " + deviceId + " received message completed test");
             currentTest = null;
         } else {
             throw new TestInProgressException();

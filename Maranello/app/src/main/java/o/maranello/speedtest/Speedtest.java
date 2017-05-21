@@ -53,7 +53,6 @@ import o.maranello.clients.SlackClient;
 public class Speedtest {
     private static final String TAG = "Speedtest";
     private final SpeedtestResults results;
-    private HashMap<String,Object> config;
     private HashMap<String, Map<String, String>> servers;
     private HashMap<String,Map<String,String>> closest;
     private Map<String,String> best;
@@ -69,9 +68,6 @@ public class Speedtest {
     }
 
     public void destroy() {
-        if (this.config != null) {
-            this.config.clear();
-        }
         if (this.servers != null) {
             this.servers.clear();
         }
@@ -90,7 +86,6 @@ public class Speedtest {
      */
     private void getConfig() throws SpeedTestException {
         Log.i(TAG, "Entry: getConfig");
-        config = new HashMap<>();
         HttpURLConnection connection = SpeedTestUtils.buildRequest("http://www.speedtest.net/speedtest-config.php", null);
         connection = SpeedTestUtils.catchRequest(connection, null);
         InputStream response = SpeedTestUtils.getResponseStream(connection);
@@ -109,44 +104,10 @@ public class Speedtest {
 
 
             Map<String, String> server_config  = SpeedTestUtils.nodeListToMap((NodeList) path.compile("/settings/server-config/@*").evaluate(document, XPathConstants.NODESET));
-            Map<String, String> download  = SpeedTestUtils.nodeListToMap((NodeList) path.compile("/settings/download/@*").evaluate(document, XPathConstants.NODESET));
-            Map<String, String> upload  = SpeedTestUtils.nodeListToMap((NodeList) path.compile("/settings/upload/@*").evaluate(document, XPathConstants.NODESET));
             Map<String, String> client  = SpeedTestUtils.nodeListToMap((NodeList) path.compile("/settings/client/@*").evaluate(document, XPathConstants.NODESET));
-
-            List<String> ignore_servers = Arrays.asList(server_config.get("ignoreids").split(","));
-
-            Integer ratio = Integer.valueOf(upload.get("ratio"));
-            //System.out.println("Upload Ratio:" + ratio);
-            Integer upload_max = Integer.valueOf(upload.get("maxchunkcount"));
-            //Integer[] up_sizes = {32768, 65536, 131072, 262144, 524288, 1048576, 7340032};
-            //Tweeking this will produce more accurate results but also send more data. original above
-            Integer[] up_sizes = {32768, 32768, 32768, 32768, 32768, 131072, 262144};
-
-            Log.i(TAG, "Upload Sizes:" + up_sizes.length);
-            Integer[] sizesUpload = new Integer[up_sizes.length - ratio +1];
-            System.arraycopy(up_sizes, ratio-1, sizesUpload, 0, up_sizes.length - ratio +1);
-            Integer countsUpload = upload_max * 2 / sizesUpload.length;
-            Integer[] sizesDownload = {350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000};
-            Integer countsDownload = Integer.valueOf(download.get("threadsperurl"));
-            Integer threadsUpload = Integer.valueOf(upload.get("threads"));
-            Integer threadsDownload = Integer.valueOf(download.get("threadsperurl")) *2;
-            Integer lengthUpload = Integer.valueOf(upload.get("testlength"));
-            Integer lengthDownload = Integer.valueOf(download.get("testlength"));
-
-            Log.i(TAG, "Count Download:" + countsDownload);
-
-
-            config.put("client",client);
-            config.put("ignore_servers",ignore_servers);
-            config.put("sizesUpload",sizesUpload);
-            config.put("sizesDownload",sizesDownload);
-            config.put("countsUpload",countsUpload);
-            config.put("countsDownload",countsDownload);
-            config.put("threadsUpload",threadsUpload);
-            config.put("threadsDownload",threadsDownload);
-            config.put("lengthUpload",lengthUpload);
-            config.put("lengthDownload",lengthDownload);
-            config.put("uploadMax",upload_max);
+            Config config = Config.getInstance();
+            config.setIgnore_servers(Arrays.asList(server_config.get("ignoreids").split(",")));
+            config.setClient(client);
 
             lat = Double.valueOf(client.get("lat"));
             lon = Double.valueOf(client.get("lon"));
@@ -173,15 +134,17 @@ public class Speedtest {
      */
     public void getServers() throws SpeedTestException {
         Log.i(TAG, "Entry: getServers");
-        String[] urls = {"http://www.speedtest.net/speedtest-servers-static.php",
-                "http://c.speedtest.net/speedtest-servers-static.php",
-                "http://www.speedtest.net/speedtest-servers.php",
-                "http://c.speedtest.net/speedtest-servers.php"};
+        //String[] urls = {"http://www.speedtest.net/speedtest-servers-static.php",
+        //        "http://c.speedtest.net/speedtest-servers-static.php",
+        //        "http://www.speedtest.net/speedtest-servers.php",
+        //        "http://c.speedtest.net/speedtest-servers.php"};
+        String[] urls = {"http://c.speedtest.net/speedtest-servers-static.php"};
         if (servers == null) {
             servers = new HashMap<>();
         }
         for (String url : urls) {
-            HttpURLConnection connection = SpeedTestUtils.buildRequest(url + "?threads=" + config.get("threadsDownload"), null);
+            HttpURLConnection connection = SpeedTestUtils.buildRequest(url + "?threads=" + Config.getInstance().getThreadsDownload(), null);
+            connection.setConnectTimeout(1000);
             connection = SpeedTestUtils.catchRequest(connection, null);
             InputStream response = SpeedTestUtils.getResponseStream(connection);
             if (response == null) {
@@ -190,7 +153,7 @@ public class Speedtest {
             BufferedReader reader = new BufferedReader(new InputStreamReader(response));
             String line;
             StringBuilder buffer = new StringBuilder();
-            List<String> ignore_servers = (List<String>) config.get("ignore_servers");
+            List<String> ignore_servers = (List<String>) Config.getInstance().getIgnore_servers();
             try {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
@@ -249,9 +212,9 @@ public class Speedtest {
         if (servers == null){
             try {
                 getServers();
-                ConfigHelper.getInstance().setServers(servers);
+                Config.getInstance().setServers(servers);
             } catch (SpeedTestException e) {
-                servers = ConfigHelper.getInstance().getServers();
+                servers = Config.getInstance().getServers();
             }
         }
         List<Map<String, String>> sorted = new ArrayList<Map<String, String>>(servers.values());
@@ -331,7 +294,7 @@ public class Speedtest {
             }
             Double average = 1.0d * sum / samples.length;
             Long latency = average.longValue();
-            notifyTestProgress("Device " + this.device + " candidate server : " + entry.getValue().get("url") + " latency is " + latency);
+            //notifyTestProgress("Device " + this.device + " candidate server : " + entry.getValue().get("url") + " latency is " + latency);
             if (bestLatency == null || bestLatency > latency) {
                 bestLatency = latency;
                 best = entry.getValue();
@@ -339,7 +302,7 @@ public class Speedtest {
             }
         }
         results.setServer(best);
-        notifyTestProgress("Device " + this.device + " selected best server for test as: " + best.get("url"));
+        //notifyTestProgress("Device " + this.device + " selected best server for test as: " + best.get("url"));
         Log.i(TAG, "Exit: getBestServer");
     }
 
@@ -352,9 +315,9 @@ public class Speedtest {
             getBestServer();
         }
         ArrayList<String> urls = new ArrayList<>();
-        for(int i = 0; i < ((Integer[])config.get("sizesDownload")).length; i ++){
-            for(int r = 0; r < ((Integer)config.get("countsDownload")); r ++){
-                String size = String.valueOf(((Integer[])config.get("sizesDownload"))[i]);
+        for(int i = 0; i < (Config.getInstance().getSizesDownload()).length; i ++){
+            for(int r = 0; r < (Config.getInstance().getIterationsDownload()); r ++){
+                String size = String.valueOf((Config.getInstance().getSizesDownload())[i]);
                 String downloadUrl = "";
                 downloadUrl += FilenameUtils.getPath(best.get("url"));
                 downloadUrl += "random";
@@ -371,8 +334,8 @@ public class Speedtest {
         for(String url : urls){
             requests.add(SpeedTestUtils.buildRequest(url, null));
         }
-        Log.i(TAG, "Downloading using Threadcount " + config.get("threadsDownload"));
-        BlockingQueue<Map<HTTPDownloader,Thread>> queue = new ArrayBlockingQueue<>((Integer)config.get("threadsDownload"));
+        Log.i(TAG, "Download Count: " + requestCount);
+        BlockingQueue<Map<HTTPDownloader,Thread>> queue = new ArrayBlockingQueue<>(Config.getInstance().getThreadsDownload());
         DownloadProducer producer = new DownloadProducer(queue, requests);
         DownloadConsumer consumer = new DownloadConsumer(queue, requestCount, finished);
         //starting producer to produce messages in queue
@@ -398,9 +361,7 @@ public class Speedtest {
             totalDownload += result;
         }
         Double downloadResult = (totalDownload / (stop - start)) * 8.0;
-        if(downloadResult > 100000){
-            config.put("threadsUpload",8);
-        }
+
         //queue.remove();
         results.setBytesReceived(totalDownload);
         results.setDownloadSpeed(downloadResult);
@@ -412,26 +373,20 @@ public class Speedtest {
         if (best == null){
             getBestServer();
         }
-        ArrayList<Integer> sizes = new ArrayList<>();
-        Integer requestCount = (Integer)config.get("uploadMax");
         HashMap<HttpURLConnection, HTTPUploaderData> requests = new HashMap<>();
         ArrayList<Long> finished = new ArrayList<>();
-        for(int i = 0; i < ((Integer[])config.get("sizesUpload")).length; i ++) {
-            for (int r = 0; r < ((Integer) config.get("countsUpload")); r++) {
+        for(int i = 0; i < (Config.getInstance().getSizesUpload()).length; i ++) {
+            for (int r = 0; r < (Config.getInstance().getIterationsUpload()); r++) {
                 //System.out.println(((Integer[])config.get("sizesUpload"))[i]);
-                sizes.add(((Integer[])config.get("sizesUpload"))[i]);
+                HTTPUploaderData data = new HTTPUploaderData((Config.getInstance().getSizesUpload())[i]);
+                data.createData();
+                requests.put(SpeedTestUtils.buildRequest(best.get("url"), data.getData()), data);
             }
         }
-        for(Integer size : sizes){
-            // We set ``0`` for ``start`` and handle setting the actual
-            // ``start`` in ``HTTPUploader`` to get better measurements
-            HTTPUploaderData data = new HTTPUploaderData(size);
-            data.createData();
-            requests.put(SpeedTestUtils.buildRequest(best.get("url"), data.getData()), data);
-        }
-
-        BlockingQueue<Map<HTTPUploader,Thread>> queue = new ArrayBlockingQueue<>((Integer)config.get("threadsUpload"));
+        Integer requestCount = requests.size();
+        BlockingQueue<Map<HTTPUploader,Thread>> queue = new ArrayBlockingQueue<>(Config.getInstance().getThreadsUpload());
         Long start = System.currentTimeMillis();
+        Log.i(TAG, "Upload Count: " + requestCount);
         UploadProducer producer = new UploadProducer(queue, requests, requestCount);
         UploadConsumer consumer = new UploadConsumer(queue, requestCount, finished);
         //starting producer to produce messages in queue
@@ -473,9 +428,8 @@ public class Speedtest {
         try {
             try {
                 getConfig();
-                ConfigHelper.getInstance().setConfig(config);
             } catch (SpeedTestException e) {
-                config = ConfigHelper.getInstance().getConfig();
+                e.printStackTrace();
             }
             download();
             upload();
